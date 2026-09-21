@@ -1,0 +1,172 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# ============================================================
+
+# Python
+
+# ============================================================
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+
+.venv/
+venv/
+env/
+ENV/
+
+# Python packaging
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ============================================================
+
+# Environment variables / Secrets
+
+# ============================================================
+
+.env
+.env.*
+!.env.example
+
+# ============================================================
+
+# Testing / Coverage
+
+# ============================================================
+
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.pyre/
+.ruff_cache/
+
+# ============================================================
+
+# Jupyter
+
+# ============================================================
+
+.ipynb_checkpoints/
+
+# ============================================================
+
+# Generated / Processed Data
+
+# ============================================================
+
+# Ignore generated chunks
+
+backend/data/processed/
+
+# Ignore evaluation outputs
+
+backend/data/evaluation/
+
+# ============================================================
+
+# Frontend - Node
+
+# ============================================================
+
+frontend/node_modules/
+frontend/.npm/
+frontend/.yarn/
+frontend/.pnp/
+frontend/.pnp.js
+
+# Frontend build output
+
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/.vite/
+
+# Frontend environment files
+
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# ============================================================
+
+# IDE / Editors
+
+# ============================================================
+
+.vscode/
+.idea/
+
+# VS Code workspace files
+
+*.code-workspace
+
+# ============================================================
+
+# OS Files
+
+# ============================================================
+
+# Windows
+
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+
+# macOS
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ============================================================
+
+# Logs
+
+# ============================================================
+
+*.log
+logs/
+
+# ============================================================
+
+# Temporary files
+
+# ============================================================
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ============================================================
+
+# Local databases
+
+# ============================================================
+
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-journal
