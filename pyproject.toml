@@ -1,15 +1,17 @@
 [project]
 name = "rag-evaluation-lab"
 version = "0.1.0"
-description = "Add your description here"
+description = "RAG Evaluation Lab"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.141.1",
+    "numpy>=2.4.6",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
     "pypdf>=6.19.0",
     "python-dotenv>=1.2.3",
+    "sentence-transformers>=6.1.0",
     "tiktoken>=0.14.0",
     "uvicorn>=0.53.0",
 ]
