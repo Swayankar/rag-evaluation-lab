@@ -10,14 +10,19 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+BASE_DIR = Path(__file__).resolve().parents[3]
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=BASE_DIR / ".env",
+        extra="ignore"
+    )
 
-    # --- LLM (Grok / xAI) ---
-    grok_api_key: str = ""
-    grok_model: str = ""
-    grok_base_url: str = "https://api.x.ai/v1"
+    # --- LLM (Groq) ---
+    groq_api_key: str = ""
+    groq_model: str = "openai/gpt-oss-20b"
+    groq_base_url: str = "https://api.groq.com/openai/v1"
 
     # --- LangSmith (wired up in a later phase) ---
     langchain_tracing_v2: bool = False
