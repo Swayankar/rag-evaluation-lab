@@ -10,13 +10,13 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 
 @router.get("", response_model=DocumentsResponse)
 def list_documents(settings: Settings = Depends(get_settings)) -> DocumentsResponse:
-    chunks_path = settings.processed_chunks_path / "fixed_chunks.json"
+    chunks_path = settings.chunks_path_for("fixed")
     if not chunks_path.exists():
         raise HTTPException(
             status_code=503,
             detail=(
                 f"No ingested documents found at {chunks_path}. "
-                "Run scripts/ingest_documents.py first (Phase 1)."
+                "Run scripts/ingest_documents.py first."
             ),
         )
 

@@ -1,3 +1,8 @@
+"""
+Strategy A: fixed-size token windows with a fixed overlap. 
+This is the baseline every other chunking strategy gets
+compared against.
+"""
 from itertools import groupby
 
 from app.chunking.base import BaseChunker
@@ -5,34 +10,9 @@ from app.core.logging import get_logger
 from app.ingestion.cleaner import clean_text
 from app.ingestion.metadata import extract_year
 from app.models.document import Chunk, RawPage
+from app.utils.token_counter import decode, encode
 
 logger = get_logger(__name__)
-
-
-class _WhitespaceEncoding:
-
-    def encode(self, text: str) -> list[str]:
-        return text.split()
-
-    def decode(self, tokens: list[str]) -> str:
-        return " ".join(tokens)
-
-
-def _load_encoding():
-    try:
-        import tiktoken
-
-        return tiktoken.get_encoding("cl100k_base")
-    except Exception as exc:  # noqa: BLE001 - deliberately broad, this is a fallback
-        logger.warning(
-            "tiktoken encoding unavailable (%s) — falling back to whitespace "
-            "tokenization. Chunk sizes will be approximate.",
-            exc,
-        )
-        return _WhitespaceEncoding()
-
-
-_ENCODING = _load_encoding()
 
 
 class FixedChunker(BaseChunker):
@@ -63,10 +43,10 @@ class FixedChunker(BaseChunker):
 
         # Concatenate all pages, remembering which page each token
         # roughly falls on so we can still tag chunks with a page number.
-        all_tokens: list[int] = []
+        all_tokens: list = []
         token_page_map: list[int] = []
         for page in pages:
-            page_tokens = _ENCODING.encode(clean_text(page.text))
+            page_tokens = encode(clean_text(page.text))
             all_tokens.extend(page_tokens)
             token_page_map.extend([page.page] * len(page_tokens))
 
@@ -80,7 +60,7 @@ class FixedChunker(BaseChunker):
         while start < len(all_tokens):
             end = min(start + self.chunk_size, len(all_tokens))
             token_slice = all_tokens[start:end]
-            text = _ENCODING.decode(token_slice)
+            text = decode(token_slice)
             page_for_chunk = token_page_map[start]
 
             chunks.append(

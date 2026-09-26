@@ -16,6 +16,8 @@ backend/data/processed/chunks/*.json
 backend/data/processed/chunks/*.pkl
 backend/data/processed/vector_store/*.npy
 backend/data/processed/vector_store/*.json
+backend/data/processed/vector_store_semantic/*.npy
+backend/data/processed/vector_store_semantic/*.json
 
 # Keep .gitkeep placeholders
 !.gitkeep

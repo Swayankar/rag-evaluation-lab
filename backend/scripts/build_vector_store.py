@@ -1,5 +1,29 @@
 #!/usr/bin/env python
+"""
+Smoke test.
 
+Usage:
+    cd backend
+    python scripts/build_vector_store.py
+    python scripts/build_vector_store.py --chunking semantic
+    python scripts/build_vector_store.py --query "How many weeks of parental leave do employees get?"
+
+--chunking fixed (default) reads data/processed/chunks/fixed_chunks.json
+and writes data/processed/vector_store/.
+--chunking semantic reads data/processed/chunks/semantic_chunks.json
+(run scripts/ingest_documents.py --chunking semantic first) and writes
+to a sibling directory, data/processed/vector_store_semantic/, so both
+can exist and be compared side by side.
+
+This will:
+  1. load the chunks produced by ingestion for the chosen strategy
+  2. embed every chunk's text
+  3. build + save a vector store
+  4. run a sanity check: query with one chunk's own text and confirm
+     it retrieves itself as the top (or near-top) match
+  5. if --query is given, run that as a real retrieval test and print
+     the top matches with their source document/page
+"""
 import argparse
 import json
 import sys
@@ -13,6 +37,7 @@ from app.embeddings.embedder import get_embedder  # noqa: E402
 from app.models.document import Chunk  # noqa: E402
 from app.retrieval.vector_search import VectorStore  # noqa: E402
 
+
 logger = get_logger(__name__)
 
 
@@ -23,7 +48,13 @@ def load_chunks(path: Path) -> list[Chunk]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Phase 2: build + test the vector store")
+    parser = argparse.ArgumentParser(description="Build + test the vector store")
+    parser.add_argument(
+        "--chunking",
+        choices=["fixed", "semantic"],
+        default="fixed",
+        help="Which chunking strategy's output to embed (default: fixed)",
+    )
     parser.add_argument("--query", default=None, help="A real question to test retrieval with")
     parser.add_argument("--top-k", type=int, default=3)
     args = parser.parse_args()
@@ -31,16 +62,17 @@ def main() -> None:
     setup_logging()
     settings = get_settings()
 
-    chunks_path = settings.processed_chunks_path / "fixed_chunks.json"
+    chunks_path = settings.chunks_path_for(args.chunking)
     if not chunks_path.exists():
+        ingest_flag = "" if args.chunking == "fixed" else f" --chunking {args.chunking}"
         print(
             f"\nNo chunks found at {chunks_path}.\n"
-            "Run Phase 1 first: python scripts/ingest_documents.py"
+            f"Run ingestion first: python scripts/ingest_documents.py{ingest_flag}"
         )
         return
 
     chunks = load_chunks(chunks_path)
-    print(f"Loaded {len(chunks)} chunks from Phase 1 output.")
+    print(f"Loaded {len(chunks)} '{args.chunking}' chunks.")
 
     embedder = get_embedder(settings)
     print(f"Embedder: {type(embedder).__name__} (dim={embedder.dimension})")
@@ -50,9 +82,10 @@ def main() -> None:
 
     store = VectorStore()
     store.build(chunks, embeddings)
-    store.save(settings.vector_store_path)
+    vector_store_path = settings.vector_store_path_for(args.chunking)
+    store.save(vector_store_path)
     print(
-        f"\n✅ Vector store saved to {settings.vector_store_path} "
+        f"\n✅ Vector store saved to {vector_store_path} "
         f"({len(store)} vectors, dim={embeddings.shape[1]})"
     )
 

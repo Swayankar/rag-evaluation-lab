@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     fixed_chunk_size: int = 500
     fixed_chunk_overlap: int = 50
 
+    # Semantic chunking (Strategy B) tunables.
+    semantic_breakpoint_percentile: float = 90.0
+    semantic_min_chunk_tokens: int = 150
+    semantic_max_chunk_tokens: int = 700
+
     # --- Embeddings ---
     # "sentence_transformers" for real semantic embeddings, or "hashing"
     # for the dependency-free fallback (also used automatically if
@@ -56,6 +61,22 @@ class Settings(BaseSettings):
     @property
     def vector_store_path(self) -> Path:
         return Path(self.vector_store_dir)
+
+    def chunks_path_for(self, chunking_strategy: str) -> Path:
+        """Where a given chunking strategy's output lives. "fixed" keeps
+        the original filename (fixed_chunks.json) for backward
+        compatibility; other strategies (e.g. "semantic")
+        get their own sibling file so both can exist side by side."""
+        return self.processed_chunks_path / f"{chunking_strategy}_chunks.json"
+
+    def vector_store_path_for(self, chunking_strategy: str) -> Path:
+        """Where a given chunking strategy's vector store lives. "fixed"
+        resolves to the exact same directory (no regression); 
+        other strategies get a sibling directory, e.g.
+        data/processed/vector_store_semantic/."""
+        if chunking_strategy == "fixed":
+            return self.vector_store_path
+        return self.vector_store_path.parent / f"{self.vector_store_path.name}_{chunking_strategy}"
 
 
 @lru_cache

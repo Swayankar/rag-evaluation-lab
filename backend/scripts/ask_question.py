@@ -6,16 +6,30 @@ Usage:
     cd backend
     python scripts/ask_question.py "How many weeks of parental leave do employees get?"
     python scripts/ask_question.py "How many weeks of parental leave?" --strategy hybrid
-    python scripts/ask_question.py "How many weeks of parental leave?" --strategy hybrid_rerank --top-k 8
+    python scripts/ask_question.py "How many weeks of parental leave?" --chunking semantic --strategy hybrid_rerank
 
---strategy chooses which retrieval strategy answers the question:
-    vector         Experiment: plain vector (semantic) search
+--chunking + --strategy together map onto the 5 experiments from the
+architecture doc:
+    Experiment 1: --chunking fixed    --strategy vector
+    Experiment 2: --chunking semantic --strategy vector
+    Experiment 3: --chunking fixed    --strategy hybrid
+    Experiment 4: --chunking semantic --strategy hybrid
+    Experiment 5: --chunking semantic --strategy hybrid_rerank
+
+--chunking selects which chunked corpus to search:
+    fixed     (default) Strategy A: fixed-size token windows
+    semantic  Strategy B: topic-change breakpoints via embedding similarity
+
+--strategy chooses the retrieval strategy:
+    vector         plain vector (semantic) search
     bm25           lexical keyword search — good for exact terms/numbers
-    hybrid         Experiment: vector + BM25, combined via Reciprocal Rank Fusion
-    hybrid_rerank  Experiment: hybrid, then reranked with a cross-encoder
+    hybrid         vector + BM25, combined via Reciprocal Rank Fusion
+    hybrid_rerank  hybrid, then reranked with a cross-encoder
 
 Requires:
-  - (data/processed/chunks + data/processed/vector_store exist)
+  - Ingestion + vector store built for the chosen --chunking value
+    (data/processed/chunks/<chunking>_chunks.json,
+    data/processed/vector_store[_<chunking>]/)
   - GROQ_API_KEY set in the .env file at the project root
 
 This will:
@@ -40,6 +54,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Ask a question through the RAG pipeline")
     parser.add_argument("question", help="The question to ask")
     parser.add_argument(
+        "--chunking",
+        choices=["fixed", "semantic"],
+        default="fixed",
+        help="Chunking strategy to search (default: fixed)",
+    )
+    parser.add_argument(
         "--strategy",
         choices=["vector", "bm25", "hybrid", "hybrid_rerank"],
         default="vector",
@@ -51,7 +71,8 @@ def main() -> None:
     setup_logging()
 
     strategy = StrategyConfig(
-        name=f"fixed_{args.strategy}",
+        name=f"{args.chunking}_{args.strategy}",
+        chunking_strategy=args.chunking,
         retrieval_strategy=args.strategy,
         top_k=args.top_k,
     )
@@ -63,7 +84,7 @@ def main() -> None:
         return
 
     print(f"Question: {args.question}")
-    print(f"Strategy: {args.strategy}\n")
+    print(f"Strategy: chunking={args.chunking}, retrieval={args.strategy}\n")
     print("Retrieving relevant chunks and calling Groq...")
 
     try:
