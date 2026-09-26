@@ -8,7 +8,7 @@ import pytest
 
 from app.core.config import Settings
 from app.generation.answer_generator import AnswerGenerator
-from app.generation.llm import GrokClient, GrokClientError
+from app.generation.llm import GroqClient, GroqClientError
 from app.generation.prompts import build_user_prompt
 from app.models.document import Chunk
 from app.models.query import RetrievedChunk
@@ -30,7 +30,7 @@ def _make_retrieved(chunk_id: str, text: str, score: float = 0.9) -> RetrievedCh
 
 
 class FakeLLMClient:
-    """Stands in for GrokClient in tests — returns a canned response
+    """Stands in for GroqClient in tests — returns a canned response
     instead of calling the real API."""
 
     def __init__(self, canned_response: str):
@@ -84,10 +84,10 @@ def test_answer_generator_ignores_out_of_range_citations():
     assert result.citations == []
 
 
-def test_grok_client_requires_api_key():
-    settings = Settings(grok_api_key="", _env_file=None)
-    with pytest.raises(GrokClientError):
-        GrokClient(settings=settings)
+def test_groq_client_requires_api_key():
+    settings = Settings(groq_api_key="", _env_file=None)
+    with pytest.raises(GroqClientError):
+        GroqClient(settings=settings)
 
 
 def test_rag_pipeline_requires_vector_store():
@@ -95,7 +95,7 @@ def test_rag_pipeline_requires_vector_store():
         settings = Settings(
             embedding_backend="hashing",
             vector_store_dir=str(Path(tmp) / "does-not-exist"),
-            grok_api_key="fake-key-for-this-test",
+            groq_api_key="fake-key-for-this-test",
             _env_file=None,
         )
         with pytest.raises(FileNotFoundError):
@@ -125,7 +125,7 @@ def test_rag_pipeline_answer_end_to_end_with_fake_llm():
         settings = Settings(
             embedding_backend="hashing",
             vector_store_dir=str(vector_store_dir),
-            grok_api_key="fake-key-for-this-test",
+            groq_api_key="fake-key-for-this-test",
             _env_file=None,
         )
         fake_llm = FakeLLMClient("You get 16 weeks [1].")
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     test_build_user_prompt_handles_no_results()
     test_answer_generator_extracts_valid_citations()
     test_answer_generator_ignores_out_of_range_citations()
-    test_grok_client_requires_api_key()
+    test_groq_client_requires_api_key()
     test_rag_pipeline_requires_vector_store()
     test_rag_pipeline_answer_end_to_end_with_fake_llm()
     print("✅ All generation/pipeline tests passed.")

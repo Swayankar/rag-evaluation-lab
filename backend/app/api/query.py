@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.dependencies import get_rag_pipeline
+from app.core.dependencies import get_pipeline_for_strategy, get_rag_pipeline
 from app.core.logging import get_logger
 from app.generation.llm import GroqClientError
 from app.models.schemas import (
@@ -21,13 +21,16 @@ def ask_question(
     request: QueryRequest,
     pipeline: RAGPipeline = Depends(get_rag_pipeline),
 ) -> QueryResponse:
+    if request.retrieval_strategy is not None and request.retrieval_strategy != "vector":
+        pipeline = get_pipeline_for_strategy(request.retrieval_strategy)
+
     if request.top_k is not None:
         pipeline.strategy.top_k = request.top_k
 
     try:
         result = pipeline.answer(request.question)
     except GroqClientError as exc:
-        logger.error("Grok call failed: %s", exc)
+        logger.error("Groq call failed: %s", exc)
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
     return QueryResponse(

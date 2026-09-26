@@ -41,7 +41,7 @@ def _build_fake_pipeline(tmp_path: Path) -> RAGPipeline:
     settings = Settings(
         embedding_backend="hashing",
         vector_store_dir=str(vector_store_dir),
-        grok_api_key="fake-key-for-tests",
+        groq_api_key="fake-key-for-tests",
         _env_file=None,
     )
     return RAGPipeline(settings=settings, answer_generator=AnswerGenerator(llm_client=FakeLLMClient()))
@@ -86,6 +86,7 @@ def test_health_check():
 
 
 def test_query_without_pipeline_returns_503():
+    # raises FileNotFoundError -> get_rag_pipeline turns that into a 503.
     from fastapi import HTTPException
 
     def _pipeline_not_ready():
@@ -119,6 +120,8 @@ def test_query_returns_answer_with_citations(tmp_path):
 
 
 def test_query_rejects_empty_question(tmp_path):
+    # Override the pipeline dependency so only the request validation is
+    # under test here — without this, the missing-pipeline 503 would win.
     pipeline = _build_fake_pipeline(tmp_path)
     app.dependency_overrides[get_rag_pipeline] = lambda: pipeline
     try:
@@ -155,6 +158,30 @@ def test_documents_endpoint_503_when_not_ingested(tmp_path):
         app.dependency_overrides.clear()
 
 
+def test_query_with_explicit_retrieval_strategy_bypasses_default_pipeline(tmp_path, monkeypatch):
+    """A request with retrieval_strategy != "vector" should route through
+    get_pipeline_for_strategy instead of the default cached pipeline."""
+    import app.api.query as query_module
+
+    default_pipeline = _build_fake_pipeline(tmp_path)
+    strategy_pipeline = _build_fake_pipeline(tmp_path)
+
+    app.dependency_overrides[get_rag_pipeline] = lambda: default_pipeline
+    monkeypatch.setattr(
+        query_module, "get_pipeline_for_strategy", lambda strategy: strategy_pipeline
+    )
+    try:
+        client = TestClient(app)
+        response = client.post(
+            "/query",
+            json={"question": "How much leave?", "retrieval_strategy": "hybrid"},
+        )
+        assert response.status_code == 200
+        assert "16 weeks" in response.json()["answer"]
+    finally:
+        app.dependency_overrides.clear()
+
+
 if __name__ == "__main__":
     import tempfile
 
@@ -168,4 +195,4 @@ if __name__ == "__main__":
         test_documents_endpoint_lists_ingested_docs(Path(tmp))
     with tempfile.TemporaryDirectory() as tmp:
         test_documents_endpoint_503_when_not_ingested(Path(tmp))
-    print("✅ All API tests passed.")
+    print("✅ All API tests passed. (run test_query_with_explicit_retrieval_strategy via pytest for monkeypatch)")

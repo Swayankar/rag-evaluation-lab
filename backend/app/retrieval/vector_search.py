@@ -4,7 +4,10 @@ from pathlib import Path
 import numpy as np
 
 from app.core.logging import get_logger
+from app.embeddings.embedder import BaseEmbedder
 from app.models.document import Chunk
+from app.models.query import RetrievedChunk
+from app.retrieval.base import BaseRetriever
 
 logger = get_logger(__name__)
 
@@ -65,3 +68,17 @@ class VectorStore:
 
     def __len__(self) -> int:
         return len(self._chunks)
+
+
+class VectorRetriever(BaseRetriever):
+    """Adapts VectorStore to the BaseRetriever interface: embeds the
+    query text, then does the cosine search."""
+
+    def __init__(self, store: VectorStore, embedder: BaseEmbedder):
+        self.store = store
+        self.embedder = embedder
+
+    def retrieve(self, query: str, top_k: int = 5) -> list[RetrievedChunk]:
+        query_embedding = self.embedder.embed_query(query)
+        results = self.store.search(query_embedding, top_k=top_k)
+        return [RetrievedChunk(chunk=chunk, score=score) for chunk, score in results]
