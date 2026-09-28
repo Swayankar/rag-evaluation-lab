@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     raw_docs_dir: str = "data/documents"
     processed_chunks_dir: str = "data/processed/chunks"
     vector_store_dir: str = "data/processed/vector_store"
+    eval_dataset_dir: str = "data/evaluation"
 
     @property
     def raw_docs_path(self) -> Path:
@@ -61,6 +62,14 @@ class Settings(BaseSettings):
     @property
     def vector_store_path(self) -> Path:
         return Path(self.vector_store_dir)
+
+    @property
+    def eval_dataset_path(self) -> Path:
+        return Path(self.eval_dataset_dir) / "questions.json"
+
+    @property
+    def eval_results_dir(self) -> Path:
+        return Path(self.eval_dataset_dir) / "results"
 
     def chunks_path_for(self, chunking_strategy: str) -> Path:
         """Where a given chunking strategy's output lives. "fixed" keeps
