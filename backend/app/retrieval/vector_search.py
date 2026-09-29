@@ -8,6 +8,7 @@ from app.embeddings.embedder import BaseEmbedder
 from app.models.document import Chunk
 from app.models.query import RetrievedChunk
 from app.retrieval.base import BaseRetriever
+from app.tracing.langsmith import trace_retriever
 
 logger = get_logger(__name__)
 
@@ -78,6 +79,7 @@ class VectorRetriever(BaseRetriever):
         self.store = store
         self.embedder = embedder
 
+    @trace_retriever("vector_search")
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievedChunk]:
         query_embedding = self.embedder.embed_query(query)
         results = self.store.search(query_embedding, top_k=top_k)

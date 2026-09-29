@@ -1,6 +1,7 @@
 from app.core.logging import get_logger
 from app.models.query import RetrievedChunk
 from app.retrieval.base import BaseRetriever
+from app.tracing.langsmith import trace_retriever
 
 logger = get_logger(__name__)
 
@@ -18,6 +19,7 @@ class HybridRetriever(BaseRetriever):
         self.rrf_k = rrf_k  # standard default from the original RRF paper
         self.fetch_k = fetch_k  # candidates pulled from each side before fusing
 
+    @trace_retriever("hybrid_search")
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievedChunk]:
         vector_results = self.vector_retriever.retrieve(query, top_k=self.fetch_k)
         bm25_results = self.bm25_retriever.retrieve(query, top_k=self.fetch_k)

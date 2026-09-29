@@ -14,6 +14,7 @@ from app.core.logging import get_logger
 from app.models.document import Chunk
 from app.models.query import RetrievedChunk
 from app.retrieval.base import BaseRetriever
+from app.tracing.langsmith import trace_retriever
 
 logger = get_logger(__name__)
 
@@ -30,6 +31,7 @@ class BM25Retriever(BaseRetriever):
         tokenized_corpus = [_tokenize(c.text) for c in chunks]
         self._bm25 = BM25Okapi(tokenized_corpus) if tokenized_corpus else None
 
+    @trace_retriever("bm25_search")
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievedChunk]:
         if self._bm25 is None:
             return []

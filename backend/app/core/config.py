@@ -24,10 +24,14 @@ class Settings(BaseSettings):
     groq_model: str = "openai/gpt-oss-20b"
     groq_base_url: str = "https://api.groq.com/openai/v1"
 
-    # --- LangSmith (wired up in a later phase) ---
+    # --- LangSmith ---
+    # Tracing is opt-in: it stays off unless LANGCHAIN_TRACING_V2=true AND a
+    # key is set. Traces include prompts and retrieved document text, so
+    # only turn it on if you're comfortable with that going to LangSmith.
     langchain_tracing_v2: bool = False
     langchain_api_key: str = ""
     langchain_project: str = "rag-evaluation-lab"
+    langsmith_endpoint: str = ""
 
     # --- Chunking defaults ---
     fixed_chunk_size: int = 500

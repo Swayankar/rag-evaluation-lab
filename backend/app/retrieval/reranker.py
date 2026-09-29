@@ -1,6 +1,7 @@
 from app.core.logging import get_logger
 from app.models.query import RetrievedChunk
 from app.retrieval.base import BaseRetriever
+from app.tracing.langsmith import trace_retriever
 
 logger = get_logger(__name__)
 
@@ -54,6 +55,7 @@ class RerankingRetriever(BaseRetriever):
         self.reranker = reranker
         self.fetch_k = fetch_k
 
+    @trace_retriever("rerank_retriever")
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievedChunk]:
         candidates = self.base_retriever.retrieve(query, top_k=self.fetch_k)
         return self.reranker.rerank(query, candidates, top_k=top_k)

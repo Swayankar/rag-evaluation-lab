@@ -10,6 +10,8 @@ usage); "semantic" points at the sibling files/directories produced by
 scripts/ingest_documents.py --chunking semantic and
 scripts/build_vector_store.py --chunking semantic.
 """
+import time
+
 from app.core.config import Settings, get_settings
 from app.core.logging import get_logger
 from app.embeddings.embedder import get_embedder
@@ -21,6 +23,13 @@ from app.retrieval.bm25_search import BM25Retriever
 from app.retrieval.hybrid_search import HybridRetriever
 from app.retrieval.reranker import RerankingRetriever, get_reranker
 from app.retrieval.vector_search import VectorRetriever, VectorStore
+from app.tracing.langsmith import (
+    annotate_current_run,
+    configure_tracing,
+    strip_self,
+    summarize_query_result,
+    traceable,
+)
 
 logger = get_logger(__name__)
 
@@ -34,6 +43,9 @@ class RAGPipeline:
     ):
         self.settings = settings or get_settings()
         self.strategy = strategy or StrategyConfig()
+        # Copies LANGCHAIN_* from .env into the environment the LangSmith SDK
+        # reads. A no-op unless tracing is switched on.
+        configure_tracing(self.settings)
         self.embedder = get_embedder(self.settings)
         self.retriever = self._build_retriever()
         # Lazy: don't require a Groq API key just to construct the pipeline
@@ -88,7 +100,23 @@ class RAGPipeline:
             )
         return BM25Retriever.from_chunks_file(chunks_path)
 
+    @traceable(
+        name="rag_pipeline",
+        run_type="chain",
+        process_inputs=strip_self,
+        process_outputs=summarize_query_result,
+    )
     def answer(self, question: str) -> QueryResult:
+        annotate_current_run(
+            metadata={
+                "chunking_strategy": self.strategy.chunking_strategy,
+                "retrieval_strategy": self.strategy.retrieval_strategy,
+                "top_k": self.strategy.top_k,
+                "strategy_name": self.strategy.name,
+            },
+            tags=[self.strategy.name],
+        )
+        start = time.perf_counter()
         retrieved = self.retriever.retrieve(question, top_k=self.strategy.top_k)
         logger.info(
             "Retrieved %d chunks (chunking=%s, retrieval=%s) for question: %r",
@@ -97,4 +125,6 @@ class RAGPipeline:
             self.strategy.retrieval_strategy,
             question,
         )
-        return self.answer_generator.generate(question, retrieved, strategy=self.strategy.name)
+        result = self.answer_generator.generate(question, retrieved, strategy=self.strategy.name)
+        result.latency_ms = (time.perf_counter() - start) * 1000
+        return result

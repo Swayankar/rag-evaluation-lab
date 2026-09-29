@@ -3,7 +3,6 @@ Orchestrates one generation step: build the prompt from retrieved chunks,
 call the LLM, and parse the [N] markers it used back into structured
 Citation objects pointing at real chunks/documents/pages.
 """
-
 import re
 import time
 
@@ -11,16 +10,23 @@ from app.core.logging import get_logger
 from app.generation.llm import GroqClient
 from app.generation.prompts import SYSTEM_PROMPT, build_user_prompt
 from app.models.query import Citation, QueryResult, RetrievedChunk
+from app.tracing.langsmith import summarize_generate_inputs, summarize_query_result, traceable
 
 logger = get_logger(__name__)
 
-_CITATION_RE = re.compile(r"[\[【](\d+)[\]】]")
+_CITATION_RE = re.compile(r"\[(\d+)\]")
 
 
 class AnswerGenerator:
     def __init__(self, llm_client: GroqClient | None = None):
         self.llm_client = llm_client or GroqClient()
 
+    @traceable(
+        name="generate_answer",
+        run_type="chain",
+        process_inputs=summarize_generate_inputs,
+        process_outputs=summarize_query_result,
+    )
     def generate(
         self,
         question: str,
@@ -28,20 +34,11 @@ class AnswerGenerator:
         strategy: str = "fixed+vector",
     ) -> QueryResult:
         start = time.perf_counter()
-
         user_prompt = build_user_prompt(question, retrieved)
-
-        answer_text = self.llm_client.chat(
-            SYSTEM_PROMPT,
-            user_prompt,
-        )
-
+        answer_text = self.llm_client.chat(SYSTEM_PROMPT, user_prompt)
         latency_ms = (time.perf_counter() - start) * 1000
 
-        citations = self._extract_citations(
-            answer_text,
-            retrieved,
-        )
+        citations = self._extract_citations(answer_text, retrieved)
 
         return QueryResult(
             question=question,
@@ -54,20 +51,13 @@ class AnswerGenerator:
 
     @staticmethod
     def _extract_citations(
-        answer_text: str,
-        retrieved: list[RetrievedChunk],
+        answer_text: str, retrieved: list[RetrievedChunk]
     ) -> list[Citation]:
-
-        cited_indices = sorted(
-            {int(m) for m in _CITATION_RE.findall(answer_text)}
-        )
-
+        cited_indices = sorted({int(m) for m in _CITATION_RE.findall(answer_text)})
         citations: list[Citation] = []
-
         for idx in cited_indices:
             if 1 <= idx <= len(retrieved):
                 chunk = retrieved[idx - 1].chunk
-
                 citations.append(
                     Citation(
                         marker=f"[{idx}]",
@@ -82,5 +72,4 @@ class AnswerGenerator:
                     idx,
                     len(retrieved),
                 )
-
         return citations

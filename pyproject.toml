@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.141.1",
+    "langsmith>=0.14.1",
     "numpy>=2.4.6",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
@@ -21,4 +22,12 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning:langsmith",
 ]

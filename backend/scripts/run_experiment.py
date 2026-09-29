@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 """
-Smoke test.
+Phase 7 smoke test.
 
 Usage:
     cd backend
     python scripts/run_experiment.py
     python scripts/run_experiment.py --chunking semantic --strategy hybrid
     python scripts/run_experiment.py --no-llm-judges   # retrieval/citation metrics only, no Groq calls
+    python scripts/run_experiment.py --langsmith       # record it as a LangSmith experiment instead
 
 Requires:
   - data/evaluation/questions.json (run scripts/create_eval_dataset.py
@@ -15,6 +16,7 @@ Requires:
   - GROQ_API_KEY in .env, unless --no-llm-judges is passed (retrieval and
     citation metrics don't need it; answer correctness and faithfulness
     scoring do)
+  - LANGCHAIN_API_KEY in .env, if you pass --langsmith
 
 This will:
   1. load the evaluation dataset
@@ -36,9 +38,54 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.core.config import get_settings  # noqa: E402
 from app.core.logging import setup_logging  # noqa: E402
 from app.evaluation.dataset import load_eval_dataset  # noqa: E402
+from app.tracing.langsmith import flush_traces  # noqa: E402
 from app.evaluation.runner import EvaluationRunner  # noqa: E402
 from app.pipelines.rag_pipeline import RAGPipeline  # noqa: E402
 from app.pipelines.strategy import StrategyConfig  # noqa: E402
+
+
+def _run_on_langsmith(pipeline, dataset, settings, args) -> None:
+    from app.evaluation.langsmith_experiment import LangSmithSetupError, run_langsmith_experiment
+
+    reranker = getattr(pipeline.retriever, "reranker", None)
+    if reranker is not None and type(reranker).__name__ == "NoOpReranker":
+        print(
+            "⚠️  hybrid_rerank is running with the NoOp fallback reranker (the cross-encoder "
+            "couldn't load), so this experiment is effectively plain hybrid. "
+        )
+    if type(pipeline.embedder).__name__ == "HashingEmbedder":
+        print(
+            "⚠️  Using the HashingEmbedder fallback, not real embeddings — fine for checking "
+            "wiring, but don't trust these scores as a measure of retrieval quality."
+        )
+
+    print(f"\nRunning LangSmith experiment: {pipeline.strategy.name} ...")
+    try:
+        summary = run_langsmith_experiment(
+            pipeline,
+            dataset,
+            settings,
+            run_llm_judges=not args.no_llm_judges,
+            trace_evaluators=args.trace_evaluators,
+        )
+    except LangSmithSetupError as exc:
+        print(f"\n❌ {exc}")
+        return
+    finally:
+        flush_traces()
+
+    print("\n" + "=" * 60)
+    print(f"Experiment: {summary.experiment_name}")
+    print(f"Dataset:    {summary.dataset_name}  ({summary.num_examples} examples)")
+    if summary.num_target_errors:
+        print(f"⚠️  {summary.num_target_errors} example(s) failed to produce an answer (see the LangSmith UI for the errors)")
+    print("Averages:")
+    for key, value in sorted(summary.averages.items()):
+        print(f"  {key}: {value:.3f}")
+    print(
+        "\nOpen https://smith.langchain.com -> Datasets & Experiments -> "
+        f"{summary.dataset_name} to compare this against other experiments."
+    )
 
 
 def main() -> None:
@@ -52,6 +99,17 @@ def main() -> None:
         "--no-llm-judges",
         action="store_true",
         help="Skip answer-correctness/faithfulness scoring (no Groq calls needed)",
+    )
+    parser.add_argument(
+        "--langsmith",
+        action="store_true",
+        help="Run as a LangSmith experiment (results appear in the LangSmith UI) instead of the local runner",
+    )
+    parser.add_argument(
+        "--trace-evaluators",
+        action="store_true",
+        help="With --langsmith: also trace each evaluator call (useful for auditing the LLM judge, "
+        "but multiplies your trace count)",
     )
     args = parser.parse_args()
 
@@ -79,6 +137,10 @@ def main() -> None:
         pipeline = RAGPipeline(settings=settings, strategy=strategy)
     except FileNotFoundError as exc:
         print(f"\n{exc}")
+        return
+
+    if args.langsmith:
+        _run_on_langsmith(pipeline, dataset, settings, args)
         return
 
     runner = EvaluationRunner(pipeline, run_llm_judges=not args.no_llm_judges)

@@ -48,6 +48,7 @@ from app.core.logging import setup_logging  # noqa: E402
 from app.generation.llm import GroqClientError  # noqa: E402
 from app.pipelines.rag_pipeline import RAGPipeline  # noqa: E402
 from app.pipelines.strategy import StrategyConfig  # noqa: E402
+from app.tracing.langsmith import flush_traces, tracing_enabled  # noqa: E402
 
 
 def main() -> None:
@@ -112,4 +113,11 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        # Traces are sent from a background thread; without this, a short
+        # script can exit before the last ones go out.
+        if tracing_enabled():
+            flush_traces()
+            print("\n(Tracing was on for this run — look for it in your LangSmith project. If it's missing, check the warnings above: bad key or wrong region endpoint.)")
