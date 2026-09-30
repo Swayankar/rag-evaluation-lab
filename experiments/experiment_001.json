@@ -1,0 +1,6 @@
+{
+  "name": "experiment_1_fixed_vector",
+  "chunking_strategy": "fixed",
+  "retrieval_strategy": "vector",
+  "top_k": 5
+}

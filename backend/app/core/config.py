@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     processed_chunks_dir: str = "data/processed/chunks"
     vector_store_dir: str = "data/processed/vector_store"
     eval_dataset_dir: str = "data/evaluation"
+    # Note: this one is NOT backend-relative like the others — it's the
+    # project-root experiments/ folder from the architecture doc's layout,
+    # a sibling of backend/, not a subdirectory of it.
+    experiments_dir: str = "../experiments"
 
     @property
     def raw_docs_path(self) -> Path:
@@ -75,6 +79,10 @@ class Settings(BaseSettings):
     def eval_results_dir(self) -> Path:
         return Path(self.eval_dataset_dir) / "results"
 
+    @property
+    def experiments_results_dir(self) -> Path:
+        return Path(self.experiments_dir) / "results"
+
     def chunks_path_for(self, chunking_strategy: str) -> Path:
         """Where a given chunking strategy's output lives. "fixed" keeps
         the original filename (fixed_chunks.json) for backward
@@ -90,7 +98,6 @@ class Settings(BaseSettings):
         if chunking_strategy == "fixed":
             return self.vector_store_path
         return self.vector_store_path.parent / f"{self.vector_store_path.name}_{chunking_strategy}"
-
 
 @lru_cache
 def get_settings() -> Settings:

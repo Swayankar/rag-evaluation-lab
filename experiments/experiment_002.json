@@ -1,0 +1,6 @@
+{
+  "name": "experiment_2_semantic_vector",
+  "chunking_strategy": "semantic",
+  "retrieval_strategy": "vector",
+  "top_k": 5
+}

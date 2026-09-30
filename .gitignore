@@ -18,6 +18,8 @@ backend/data/processed/vector_store/*.npy
 backend/data/processed/vector_store/*.json
 backend/data/processed/vector_store_semantic/*.npy
 backend/data/processed/vector_store_semantic/*.json
+backend/data/evaluation/results/*.json
+experiments/results/*.json
 
 # Keep .gitkeep placeholders
 !.gitkeep
