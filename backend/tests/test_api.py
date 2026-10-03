@@ -168,7 +168,7 @@ def test_query_with_explicit_retrieval_strategy_bypasses_default_pipeline(tmp_pa
 
     app.dependency_overrides[get_rag_pipeline] = lambda: default_pipeline
     monkeypatch.setattr(
-        query_module, "get_pipeline_for_strategy", lambda strategy: strategy_pipeline
+        query_module, "get_pipeline_for_strategy",lambda retrieval, chunking="fixed": strategy_pipeline
     )
     try:
         client = TestClient(app)

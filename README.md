@@ -2,7 +2,7 @@
 
 An experimental retrieval-augmented generation (RAG) system for asking questions over a collection of PDF documents and comparing how chunking and retrieval choices affect answer quality. The repository currently contains the Python backend, command-line workflows, and experiment/evaluation tooling.
 
-> **Frontend: work in progress.** The `frontend/` directory does not yet contain an implemented user interface. For now, use the API or the backend command-line scripts.
+> **Frontend: work in progress.** The `frontend/` directory is not completed yet. For now, use the API or the backend command-line scripts.
 
 ## What it does
 
