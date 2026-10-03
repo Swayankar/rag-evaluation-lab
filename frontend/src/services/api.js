@@ -4,12 +4,14 @@ const BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:8000").replace(
 );
 
 async function request(path, { method = "GET", body, signal } = {}) {
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   let response;
   try {
     response = await fetch(`${BASE}${path}`, {
       method,
-      headers: body ? { "Content-Type": "application/json" } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
+      headers:
+        body && !isForm ? { "Content-Type": "application/json" } : undefined,
+      body: body ? (isForm ? body : JSON.stringify(body)) : undefined,
       signal,
     });
   } catch (err) {
@@ -30,15 +32,44 @@ async function request(path, { method = "GET", body, signal } = {}) {
     } catch {
       /* non-JSON error body */
     }
-    throw new Error(detail);
+    const error = new Error(detail);
+    error.status = response.status;
+    throw error;
   }
   return response.json();
 }
 
 export const api = {
   health: (signal) => request("/health", { signal }),
+  config: (signal) => request("/config", { signal }),
+
   query: (body, signal) => request("/query", { method: "POST", body, signal }),
   compare: (body, signal) =>
     request("/query/compare", { method: "POST", body, signal }),
+
   documents: (signal) => request("/documents", { signal }),
+  library: (signal) => request("/documents/library", { signal }),
+  createFolder: (name) =>
+    request("/documents/folders", { method: "POST", body: { name } }),
+  deleteFolder: (name) =>
+    request(`/documents/folders/${encodeURIComponent(name)}`, {
+      method: "DELETE",
+    }),
+  upload: (department, files) => {
+    const form = new FormData();
+    form.append("department", department);
+    files.forEach((f) => form.append("files", f));
+    return request("/documents/upload", { method: "POST", body: form });
+  },
+  deleteDocument: (department, filename) =>
+    request(
+      `/documents/${encodeURIComponent(department)}/${encodeURIComponent(filename)}`,
+      { method: "DELETE" },
+    ),
+  rebuild: (chunking) =>
+    request("/documents/rebuild", { method: "POST", body: { chunking } }),
+
+  job: (id, signal) => request(`/jobs/${id}`, { signal }),
+  jobs: (kind, signal) =>
+    request(`/jobs${kind ? `?kind=${kind}` : ""}`, { signal }),
 };

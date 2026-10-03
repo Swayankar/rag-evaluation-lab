@@ -557,3 +557,219 @@ select {
     padding: 20px 14px 60px;
   }
 }
+
+/* ---- 10b: documents, progress, config ---- */
+.badge-warn {
+  color: var(--warn);
+  border-color: rgba(245, 184, 75, 0.4);
+  margin-left: 0;
+}
+.notice-ok {
+  background: rgba(62, 207, 142, 0.08);
+  border-color: rgba(62, 207, 142, 0.4);
+  color: #9be8c4;
+}
+.ok-text {
+  color: var(--ok);
+}
+.danger {
+  color: var(--err);
+}
+.two-col {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+}
+.dept-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.dept-head h3 {
+  font-size: 1.05rem;
+}
+.folder {
+  opacity: 0.8;
+}
+.doc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  margin-top: 8px;
+}
+.doc-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.doc-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.icon-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 5px 8px;
+}
+.icon-btn:hover:not(:disabled) {
+  border-color: var(--err);
+  color: var(--err);
+}
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.empty {
+  text-align: center;
+  padding: 36px;
+}
+.folder-form {
+  display: flex;
+  gap: 8px;
+}
+.text-input {
+  flex: 1;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font: inherit;
+}
+.text-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.upload-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin: 10px 0 12px;
+  flex-wrap: wrap;
+}
+.upload-row label {
+  display: flex;
+  align-items: center;
+}
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 26px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--bg);
+}
+.dropzone:hover,
+.dropzone-on {
+  border-color: var(--accent);
+  background: rgba(124, 140, 255, 0.07);
+}
+.drop-icon {
+  font-size: 1.6rem;
+  color: var(--accent);
+}
+.file-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.chip-x {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  margin-left: 6px;
+}
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-right: 6px;
+}
+.progress-wrap {
+  margin-top: 14px;
+}
+.progress {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.4s ease;
+}
+.progress-failed {
+  background: var(--err);
+}
+.cfg-badge {
+  position: relative;
+}
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+.dot-ok {
+  background: var(--ok);
+}
+.dot-warn {
+  background: var(--warn);
+}
+.dot-err {
+  background: var(--err);
+}
+.popover {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  width: 460px;
+  max-width: 90vw;
+  z-index: 20;
+}
+.cfg {
+  display: grid;
+  gap: 6px;
+}
+.cfg-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.cfg-row .mono {
+  text-align: right;
+  word-break: break-word;
+}

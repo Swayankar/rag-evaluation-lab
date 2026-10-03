@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Playground from "./pages/Playground.jsx";
+import Documents from "./pages/Documents.jsx";
 import ComingSoon from "./pages/ComingSoon.jsx";
 
 const NAV = [
@@ -37,10 +38,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/playground" element={<Playground />} />
-          <Route
-            path="/documents"
-            element={<ComingSoon title="Documents" step="10b" />}
-          />
+          <Route path="/documents" element={<Documents />} />
           <Route
             path="/evaluation"
             element={<ComingSoon title="Evaluation" step="10c" />}
