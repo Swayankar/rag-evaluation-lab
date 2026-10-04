@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import DocumentList from "../components/DocumentList.jsx";
 import UploadForm from "../components/UploadForm.jsx";
 import RebuildPanel from "../components/RebuildPanel.jsx";
+import ResetPanel from "../components/ResetPanel.jsx";
 import { api } from "../services/api.js";
 import { useJob } from "../hooks/useJob.js";
 
@@ -64,6 +65,13 @@ export default function Documents() {
 
   const upload = async (dept, files) => {
     const res = await api.upload(dept, files);
+    await refresh();
+    return res;
+  };
+
+  const resetLibrary = async (body) => {
+    const res = await api.resetLibrary(body);
+    setJobId(null);
     await refresh();
     return res;
   };
@@ -156,6 +164,11 @@ export default function Documents() {
             departments={library.departments}
             onUpload={upload}
             disabled={rebuilding}
+          />
+          <ResetPanel
+            onReset={resetLibrary}
+            disabled={rebuilding}
+            documentCount={library.total_documents}
           />
         </div>
       </div>

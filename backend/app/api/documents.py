@@ -3,6 +3,7 @@ import re
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
@@ -16,7 +17,12 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 MAX_UPLOAD_BYTES = 25 * 1024 * 1024
 _DEPT_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,39}$")
 _FILENAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,120}\.pdf$", re.IGNORECASE)
-_RESERVED_DEPTS = {"folders", "library", "upload", "rebuild"}
+_RESERVED_DEPTS = {"folders", "library", "upload", "rebuild", "reset"}  # would shadow routes
+
+
+# --------------------------------------------------------------------------
+# helpers
+# --------------------------------------------------------------------------
 
 def _normalize_department(raw: str) -> str:
     name = re.sub(r"[\s]+", "_", raw.strip().lower())
@@ -57,6 +63,11 @@ def _read_chunks(settings: Settings, chunking: str) -> list[dict] | None:
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
+
+# --------------------------------------------------------------------------
+# existing endpoint (unchanged)
+# --------------------------------------------------------------------------
+
 @router.get("", response_model=DocumentsResponse)
 def list_documents(settings: Settings = Depends(get_settings)) -> DocumentsResponse:
     chunks_path = settings.chunks_path_for("fixed")
@@ -89,6 +100,11 @@ def list_documents(settings: Settings = Depends(get_settings)) -> DocumentsRespo
         documents=[DocumentSummary(**d) for d in documents.values()],
         total_chunks=len(chunk_dicts),
     )
+
+
+# --------------------------------------------------------------------------
+# library view
+# --------------------------------------------------------------------------
 
 @router.get("/library")
 def library(settings: Settings = Depends(get_settings)) -> dict:
@@ -134,7 +150,7 @@ def library(settings: Settings = Depends(get_settings)) -> dict:
                 )
             departments.append({"name": d.name, "documents": docs})
 
-    orphaned = sorted(set(chunk_counts) - on_disk)
+    orphaned = sorted(set(chunk_counts) - on_disk)  # in the index, but the PDF is gone
     reasons = []
     if unindexed:
         reasons.append(f"{len(unindexed)} new document(s) not indexed yet")
@@ -156,6 +172,11 @@ def library(settings: Settings = Depends(get_settings)) -> dict:
         },
         "rebuild_running": job_store.is_running("rebuild"),
     }
+
+
+# --------------------------------------------------------------------------
+# folders
+# --------------------------------------------------------------------------
 
 class FolderCreate(BaseModel):
     name: str
@@ -184,6 +205,10 @@ def delete_folder(name: str, settings: Settings = Depends(get_settings)) -> dict
     return {"deleted": name}
 
 
+# --------------------------------------------------------------------------
+# files
+# --------------------------------------------------------------------------
+
 @router.post("/upload", status_code=201)
 def upload_documents(
     department: str = Form(...),
@@ -199,7 +224,7 @@ def upload_documents(
     rejected: list[dict] = []
 
     for upload in files:
-        original = Path(upload.filename or "").name
+        original = Path(upload.filename or "").name  # drop any client-side path
         stem = re.sub(r"[^A-Za-z0-9_-]+", "_", Path(original).stem).strip("_").lower()
         reject = lambda reason: rejected.append({"filename": original or "(unnamed)", "reason": reason})  # noqa: E731
 
@@ -243,19 +268,94 @@ def delete_document(department: str, filename: str, settings: Settings = Depends
     path.unlink()
     return {"deleted": filename}
 
+
+# --------------------------------------------------------------------------
+# rebuild
+# --------------------------------------------------------------------------
+
 class RebuildRequest(BaseModel):
-    chunking: list[str] | None = None
+    chunking: list[str] | None = None  # default: both "fixed" and "semantic"
 
 
 @router.post("/rebuild", status_code=202)
 def rebuild(body: RebuildRequest | None = None, settings: Settings = Depends(get_settings)) -> dict:
-    from app.ingestion.index_builder import rebuild_index
+    from app.ingestion.index_builder import rebuild_index  # lazy: pulls in the embedding stack
 
     chunking = (body.chunking if body else None) or ["fixed", "semantic"]
     bad = [c for c in chunking if c not in ("fixed", "semantic")]
     if bad:
         raise HTTPException(status_code=400, detail=f"Unknown chunking strategy: {bad}")
+    if job_store.is_running("evaluation") or job_store.is_running("experiments"):
+        raise HTTPException(status_code=409, detail="An evaluation or experiment run is in progress — wait for it to finish.")
     try:
         return job_store.start("rebuild", lambda report: rebuild_index(report, chunking, settings))
     except JobAlreadyRunning as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+# --------------------------------------------------------------------------
+# reset (start over with a different dataset)
+# --------------------------------------------------------------------------
+
+class ResetRequest(BaseModel):
+    confirm: Literal["RESET"]  # type-to-confirm: the UI makes the user type this
+    keep_folders: bool = False  # delete the PDFs but keep the (now empty) department folders
+    clear_questions: bool = False  # also delete data/evaluation/questions.json
+    clear_results: bool = False  # also delete saved evaluation results
+    clear_experiments: bool = False  # also delete experiment results + the saved comparison (definitions are kept)
+
+
+@router.post("/reset")
+def reset_library(body: ResetRequest, settings: Settings = Depends(get_settings)) -> dict:
+    """Start over: delete every PDF (and, unless keep_folders, every department
+    folder) plus the built chunks and vector stores. Evaluation questions and
+    past results are left alone unless you ask for them to be cleared too."""
+    from app.core.dependencies import clear_pipeline_cache
+    from app.ingestion.index_builder import clear_index
+
+    _ensure_not_rebuilding()
+    if job_store.is_running("evaluation") or job_store.is_running("experiments"):
+        raise HTTPException(status_code=409, detail="An evaluation or experiment run is in progress — wait for it to finish.")
+
+    root = settings.raw_docs_path.resolve()
+    if len(root.parts) < 3:
+        raise HTTPException(status_code=500, detail=f"Refusing to reset suspicious documents path: {root}")
+
+    deleted_files = 0
+    deleted_folders = 0
+    if root.exists():
+        for child in sorted(root.iterdir()):
+            if child.is_dir():
+                deleted_files += sum(1 for _ in child.rglob("*.pdf"))
+                if body.keep_folders:
+                    for pdf in child.rglob("*.pdf"):
+                        pdf.unlink()
+                else:
+                    shutil.rmtree(child)
+                    deleted_folders += 1
+            elif child.suffix.lower() == ".pdf":
+                child.unlink()
+                deleted_files += 1
+
+    clear_index(settings)
+    clear_pipeline_cache()
+
+    cleared = []
+    if body.clear_questions and settings.eval_dataset_path.exists():
+        settings.eval_dataset_path.unlink()
+        cleared.append("questions")
+    if body.clear_results and settings.eval_results_dir.exists():
+        shutil.rmtree(settings.eval_results_dir)
+        cleared.append("results")
+    if body.clear_experiments:
+        results = settings.experiments_results_dir.resolve()
+        if results.exists() and results.name == "results" and len(results.parts) >= 3:
+            shutil.rmtree(results)
+            cleared.append("experiments")
+
+    return {
+        "deleted_documents": deleted_files,
+        "deleted_folders": deleted_folders,
+        "index_cleared": True,
+        "cleared": cleared,
+    }

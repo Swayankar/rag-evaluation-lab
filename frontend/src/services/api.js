@@ -66,8 +66,42 @@ export const api = {
       `/documents/${encodeURIComponent(department)}/${encodeURIComponent(filename)}`,
       { method: "DELETE" },
     ),
+  resetLibrary: (body) => request("/documents/reset", { method: "POST", body }),
   rebuild: (chunking) =>
     request("/documents/rebuild", { method: "POST", body: { chunking } }),
+
+  questions: (signal) => request("/evaluation/questions", { signal }),
+  saveQuestions: (questions) =>
+    request("/evaluation/questions", { method: "PUT", body: { questions } }),
+  createStarterQuestions: () =>
+    request("/evaluation/questions/starter", { method: "POST" }),
+  evalRuns: (signal) => request("/evaluation/results", { signal }),
+  evalRun: (source, name, signal) =>
+    request(
+      `/evaluation/results/${encodeURIComponent(source)}/${encodeURIComponent(name)}`,
+      { signal },
+    ),
+
+  questions: (signal) => request("/evaluation/questions", { signal }),
+  saveQuestions: (questions) =>
+    request("/evaluation/questions", { method: "PUT", body: { questions } }),
+  runEvaluation: (body) => request("/evaluation/run", { method: "POST", body }),
+  evalResults: (signal) => request("/evaluation/results", { signal }),
+  evalResult: (name, signal) =>
+    request(`/evaluation/results/${encodeURIComponent(name)}`, { signal }),
+  deleteEvalResult: (name) =>
+    request(`/evaluation/results/${encodeURIComponent(name)}`, {
+      method: "DELETE",
+    }),
+
+  experimentsOverview: (signal) => request("/experiments/overview", { signal }),
+  experimentConfigs: (signal) => request("/experiments/configs", { signal }),
+  saveExperimentConfigs: (experiments) =>
+    request("/experiments/configs", { method: "PUT", body: { experiments } }),
+  runExperiments: (body) =>
+    request("/experiments/run", { method: "POST", body }),
+  experimentDetail: (name, signal) =>
+    request(`/experiments/${encodeURIComponent(name)}`, { signal }),
 
   job: (id, signal) => request(`/jobs/${id}`, { signal }),
   jobs: (kind, signal) =>

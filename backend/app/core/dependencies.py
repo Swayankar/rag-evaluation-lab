@@ -1,3 +1,5 @@
+import copy
+import dataclasses
 import threading
 
 from fastapi import HTTPException
@@ -53,3 +55,16 @@ def get_pipeline_for_strategy(
         return load_pipeline_for(chunking_strategy, retrieval_strategy)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+def with_top_k(pipeline: RAGPipeline, top_k: int | None) -> RAGPipeline:
+    """Per-request top_k WITHOUT mutating the cached, shared pipeline.
+
+    A shallow copy shares the heavy parts (embedder, vector store, retriever)
+    but gets its own StrategyConfig, so one caller's top_k can't leak into
+    another's (or race with a concurrent one)."""
+    if top_k is None or top_k == pipeline.strategy.top_k:
+        return pipeline
+    clone = copy.copy(pipeline)
+    clone.strategy = dataclasses.replace(pipeline.strategy, top_k=top_k)
+    return clone

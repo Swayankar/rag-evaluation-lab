@@ -1,0 +1,6 @@
+{
+  "name": "experiment_6_fixed_bm25",
+  "chunking_strategy": "fixed",
+  "retrieval_strategy": "bm25",
+  "top_k": 5
+}

@@ -1,0 +1,6 @@
+{
+  "name": "experiment_7_semantic_bm25",
+  "chunking_strategy": "semantic",
+  "retrieval_strategy": "bm25",
+  "top_k": 5
+}

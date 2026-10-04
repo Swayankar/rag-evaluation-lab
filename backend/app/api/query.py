@@ -1,10 +1,13 @@
-import copy
-import dataclasses
 import time
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.core.dependencies import get_pipeline_for_strategy, get_rag_pipeline, load_pipeline_for
+from app.core.dependencies import (
+    get_pipeline_for_strategy,
+    get_rag_pipeline,
+    load_pipeline_for,
+    with_top_k as _with_top_k,
+)
 from app.core.logging import get_logger
 from app.generation.llm import GroqClientError
 from app.models.query import QueryResult
@@ -26,19 +29,6 @@ router = APIRouter(prefix="/query", tags=["query"])
 CHUNKING_OPTIONS = ("fixed", "semantic")
 RETRIEVAL_OPTIONS = ("vector", "bm25", "hybrid", "hybrid_rerank")
 ALL_COMBINATIONS = [(c, r) for c in CHUNKING_OPTIONS for r in RETRIEVAL_OPTIONS]
-
-
-def _with_top_k(pipeline: RAGPipeline, top_k: int | None) -> RAGPipeline:
-    """Per-request top_k WITHOUT mutating the cached, shared pipeline.
-
-    A shallow copy shares the heavy parts (embedder, vector store, retriever)
-    but gets its own StrategyConfig, so one request's top_k can't leak into the
-    next request (or race with a concurrent one)."""
-    if top_k is None or top_k == pipeline.strategy.top_k:
-        return pipeline
-    clone = copy.copy(pipeline)
-    clone.strategy = dataclasses.replace(pipeline.strategy, top_k=top_k)
-    return clone
 
 
 def _to_response(result: QueryResult, pipeline: RAGPipeline) -> QueryResponse:

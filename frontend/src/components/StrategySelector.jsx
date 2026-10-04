@@ -6,7 +6,13 @@ import {
   keyOf,
 } from "../constants/strategies.js";
 
-export default function StrategySelector({ selected, onChange, disabled }) {
+export default function StrategySelector({
+  selected,
+  onChange,
+  disabled,
+  title = "Strategies to run",
+  description = "Pick one for a normal answer, or several to compare them side by side.",
+}) {
   const toggle = (key) => {
     const next = selected.includes(key)
       ? selected.filter((k) => k !== key)
@@ -18,11 +24,8 @@ export default function StrategySelector({ selected, onChange, disabled }) {
     <div className="card strategy-selector">
       <div className="strategy-head">
         <div>
-          <div className="field-label">Strategies to run</div>
-          <div className="muted small">
-            Pick one for a normal answer, or several to compare them side by
-            side.
-          </div>
+          <div className="field-label">{title}</div>
+          <div className="muted small">{description}</div>
         </div>
         <div className="presets">
           <button
