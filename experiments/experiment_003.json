@@ -1,6 +1,0 @@
-{
-  "name": "experiment_3_fixed_hybrid",
-  "chunking_strategy": "fixed",
-  "retrieval_strategy": "hybrid",
-  "top_k": 5
-}

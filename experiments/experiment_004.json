@@ -1,6 +1,0 @@
-{
-  "name": "experiment_4_semantic_hybrid",
-  "chunking_strategy": "semantic",
-  "retrieval_strategy": "hybrid",
-  "top_k": 5
-}

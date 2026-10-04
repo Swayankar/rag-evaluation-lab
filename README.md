@@ -13,6 +13,10 @@ RAG Evaluation Lab is a local application for exploring retrieval-augmented gene
 - Manage PDFs and department folders in the UI or API, check index freshness, rebuild indexes, and reset the library.
 - Save and compare named experiment configurations, with aggregate and per-question reports.
 
+## 🎥 Demo Video
+
+[Watch the Demo](https://youtu.be/asm-B9m5bKg)
+
 ## Repository map
 
 ```text
