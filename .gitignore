@@ -1,188 +1,55 @@
-# Python-generated files and Virtual environments
-
-__pycache__/
-*.pyc
-.venv/
-venv/
-.env
-*.egg-info/
-.pytest_cache/
-node_modules/
-dist/
-build/
-
-# Processed/generated data — keep the raw docs, not the derived output
-backend/data/processed/chunks/*.json
-backend/data/processed/chunks/*.pkl
-backend/data/processed/vector_store/*.npy
-backend/data/processed/vector_store/*.json
-backend/data/processed/vector_store_semantic/*.npy
-backend/data/processed/vector_store_semantic/*.json
-backend/data/evaluation/results/*.json
-experiments/results/*.json
-
-# Keep .gitkeep placeholders
-!.gitkeep
-
-
-# ============================================================
-
-# Python
-
-# ============================================================
-
-**pycache**/
-*.py[cod]
-*$py.class
-
-# Virtual environments
-
-.venv/
-venv/
-env/
-ENV/
-
-# Python packaging
-
-build/
-dist/
-*.egg-info/
-.eggs/
-
-# ============================================================
-
-# Environment variables / Secrets
-
-# ============================================================
-
+# ───────── Secrets ─────────
 .env
 .env.*
 !.env.example
+backend/.env
+*.key
+*.pem
 
-# ============================================================
+# ───────── Visitors' private workspaces & temp files ─────────
+backend/data/workspaces/
+backend/data/**/*.tmp
+backend/data/**/.last_used
 
-# Testing / Coverage
-
-# ============================================================
-
+# ───────── Python ─────────
+__pycache__/
+*.py[cod]
+*.pyo
 .pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
-.nox/
 .mypy_cache/
-.pyre/
 .ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
 
-# ============================================================
-
-# Jupyter
-
-# ============================================================
-
-.ipynb_checkpoints/
-
-# ============================================================
-
-# Generated / Processed Data
-
-# ============================================================
-
-# Ignore generated chunks
-
-backend/data/processed/
-
-# Ignore evaluation outputs
-
-backend/data/evaluation/
-
-# ============================================================
-
-# Frontend - Node
-
-# ============================================================
-
-frontend/node_modules/
-frontend/.npm/
-frontend/.yarn/
-frontend/.pnp/
-frontend/.pnp.js
-
-# Frontend build output
-
+# ───────── Node / frontend ─────────
+node_modules/
 frontend/dist/
-frontend/build/
-frontend/.next/
 frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
 
-# Frontend environment files
+# ───────── Model caches ─────────
+.cache/
+huggingface/
+sentence_transformers/
 
-frontend/.env
-frontend/.env.*
-!frontend/.env.example
-
-# ============================================================
-
-# IDE / Editors
-
-# ============================================================
-
-.vscode/
-.idea/
-
-# VS Code workspace files
-
-*.code-workspace
-
-# ============================================================
-
-# OS Files
-
-# ============================================================
-
-# Windows
-
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-Desktop.ini
-
-# macOS
-
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# ============================================================
-
-# Logs
-
-# ============================================================
-
+# ───────── Logs ─────────
 *.log
 logs/
 
-# ============================================================
-
-# Temporary files
-
-# ============================================================
-
-*.tmp
-*.temp
+# ───────── Editors / OS ─────────
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
 *.swp
-*.swo
-*~
-
-# ============================================================
-
-# Local databases
-
-# ============================================================
-
-*.db
-*.sqlite
-*.sqlite3
-*.db-journal
-*.sqlite-journal

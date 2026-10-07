@@ -1,0 +1,45 @@
+{
+  "strategy": "experiment_2_semantic_vector",
+  "aggregate": {
+    "num_questions": 2,
+    "num_errors": 2
+  },
+  "results": [
+    {
+      "question_id": "q1",
+      "question": "How many paid sick days are employees entitled to per calendar year?",
+      "answer": null,
+      "retrieval": null,
+      "citation": null,
+      "system": null,
+      "answer_judge": null,
+      "grounding_judge": null,
+      "judge_error": null,
+      "error": "Groq API request failed: 503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions. [{\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\n    \"status\": \"UNAVAILABLE\"\n  }\n}\n]"
+    },
+    {
+      "question_id": "q2",
+      "question": "Within how many hours must system access be revoked after an employee's termination is processed by HR?",
+      "answer": null,
+      "retrieval": null,
+      "citation": null,
+      "system": null,
+      "answer_judge": null,
+      "grounding_judge": null,
+      "judge_error": null,
+      "error": "Groq API request failed: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=60). "
+    }
+  ],
+  "meta": {
+    "ran_at": "2026-10-07T07:24:54.762805+00:00",
+    "chunking_strategy": "semantic",
+    "retrieval_strategy": "vector",
+    "top_k": 5,
+    "llm_judges": true,
+    "num_questions": 2,
+    "dataset_hash": "631ab24d",
+    "embedder": "SentenceTransformerEmbedder",
+    "reranker": null,
+    "llm_model": "gemini-3.8-flash"
+  }
+}

@@ -15,8 +15,9 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from app.core.config import Settings, get_settings
-from app.core.jobs import JobAlreadyRunning, job_store
+from app.core.config import Settings
+from app.core.jobs import JobAlreadyRunning, JobCapacityReached, job_store
+from app.core.workspaces import NO_KEY_MESSAGE, key_missing, workspace_settings
 from app.evaluation.dataset import EvalDataset, EvalQuestion, load_eval_dataset
 from app.evaluation.job import dataset_hash, run_evaluation_job, write_json_atomic
 from app.models.schemas import StrategyChoice
@@ -46,7 +47,7 @@ def _load(settings: Settings) -> EvalDataset | None:
 # --------------------------------------------------------------------------
 
 @router.get("/questions")
-def get_questions(settings: Settings = Depends(get_settings)) -> dict:
+def get_questions(settings: Settings = Depends(workspace_settings)) -> dict:
     dataset = _load(settings)
     return {
         "exists": dataset is not None,
@@ -88,8 +89,10 @@ def _clean(dataset: EvalDataset) -> tuple[list[EvalQuestion], list[str]]:
 
 
 @router.put("/questions")
-def put_questions(dataset: EvalDataset, settings: Settings = Depends(get_settings)) -> dict:
+def put_questions(dataset: EvalDataset, settings: Settings = Depends(workspace_settings)) -> dict:
     cleaned, problems = _clean(dataset)
+    if not settings.is_sample and len(cleaned) > settings.max_questions_per_workspace:
+        problems.append(f"A private workspace holds at most {settings.max_questions_per_workspace} questions.")
     if problems:
         raise HTTPException(status_code=422, detail=" ".join(problems))
 
@@ -116,13 +119,15 @@ class EvaluationRunRequest(BaseModel):
 
 
 @router.post("/run", status_code=202)
-def run_evaluation(body: EvaluationRunRequest, settings: Settings = Depends(get_settings)) -> dict:
+def run_evaluation(body: EvaluationRunRequest, settings: Settings = Depends(workspace_settings)) -> dict:
     dataset = _load(settings)
     if dataset is None or len(dataset) == 0:
         raise HTTPException(status_code=400, detail="There are no evaluation questions yet — add some first.")
-    if job_store.is_running("rebuild"):
+    if key_missing(settings):
+        raise HTTPException(status_code=400, detail=NO_KEY_MESSAGE)
+    if job_store.is_running("rebuild", settings.workspace_id):
         raise HTTPException(status_code=409, detail="An index rebuild is running — wait for it to finish.")
-    if job_store.is_running("experiments"):
+    if job_store.is_running("experiments", settings.workspace_id):
         raise HTTPException(status_code=409, detail="An experiment run is in progress — wait for it to finish.")
 
     combos = list(dict.fromkeys((s.chunking_strategy, s.retrieval_strategy) for s in body.strategies))
@@ -130,9 +135,13 @@ def run_evaluation(body: EvaluationRunRequest, settings: Settings = Depends(get_
         return job_store.start(
             "evaluation",
             lambda report: run_evaluation_job(report, combos, body.top_k, dataset, settings, body.run_llm_judges),
+            owner=settings.workspace_id,
+            max_active=settings.max_concurrent_jobs,
         )
     except JobAlreadyRunning as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except JobCapacityReached as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
 
 
 # --------------------------------------------------------------------------
@@ -147,7 +156,7 @@ def _split_name(name: str) -> tuple[str | None, str | None]:
 
 
 @router.get("/results")
-def list_results(settings: Settings = Depends(get_settings)) -> dict:
+def list_results(settings: Settings = Depends(workspace_settings)) -> dict:
     dataset = _load(settings)
     current = dataset_hash(dataset) if dataset else None
 
@@ -175,7 +184,7 @@ def list_results(settings: Settings = Depends(get_settings)) -> dict:
 
 
 @router.get("/results/{name}")
-def get_result(name: str, settings: Settings = Depends(get_settings)) -> dict:
+def get_result(name: str, settings: Settings = Depends(workspace_settings)) -> dict:
     if not _SAFE_NAME_RE.match(name):
         raise HTTPException(status_code=400, detail="Invalid result name.")
     path = settings.eval_results_dir / f"{name}.json"
@@ -185,7 +194,7 @@ def get_result(name: str, settings: Settings = Depends(get_settings)) -> dict:
 
 
 @router.delete("/results/{name}")
-def delete_result(name: str, settings: Settings = Depends(get_settings)) -> dict:
+def delete_result(name: str, settings: Settings = Depends(workspace_settings)) -> dict:
     if not _SAFE_NAME_RE.match(name):
         raise HTTPException(status_code=400, detail="Invalid result name.")
     path = settings.eval_results_dir / f"{name}.json"

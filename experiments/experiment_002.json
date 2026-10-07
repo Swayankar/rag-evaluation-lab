@@ -1,6 +1,6 @@
 {
-  "name": "experiment_5_semantic_hybrid_rerank",
-  "chunking_strategy": "semantic",
-  "retrieval_strategy": "hybrid_rerank",
+  "name": "experiment_3_fixed_hybrid",
+  "chunking_strategy": "fixed",
+  "retrieval_strategy": "hybrid",
   "top_k": 5
 }

@@ -1,0 +1,90 @@
+{
+  "strategy": "fixed_hybrid",
+  "aggregate": {
+    "num_questions": 2,
+    "avg_recall_at_k": 1.0,
+    "avg_precision_at_k": 0.2,
+    "avg_mrr": 1.0,
+    "avg_latency_ms": 910.0585499836598,
+    "avg_prompt_tokens": 1452.5,
+    "avg_citation_accuracy": 1.0,
+    "avg_correctness": 5.0,
+    "avg_relevance": 5.0,
+    "avg_completeness": 5.0,
+    "avg_faithfulness": 5.0,
+    "hallucination_rate": 0.0,
+    "num_judge_errors": 1
+  },
+  "results": [
+    {
+      "question_id": "q1",
+      "question": "How many paid sick days are employees entitled to per calendar year?",
+      "answer": "Employees are entitled to 10 paid sick days per calendar year. [1]",
+      "retrieval": {
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.2,
+        "mrr": 1.0
+      },
+      "citation": {
+        "citation_accuracy": 1.0,
+        "num_citations": 1
+      },
+      "system": {
+        "latency_ms": 604.9241999862716,
+        "approx_prompt_tokens": 1434,
+        "approx_completion_tokens": 16
+      },
+      "answer_judge": {
+        "correctness": 5.0,
+        "relevance": 5.0,
+        "completeness": 5.0,
+        "rationale": "The answer matches the reference exactly."
+      },
+      "grounding_judge": {
+        "faithfulness": 5.0,
+        "likely_hallucination": false,
+        "rationale": "The answer accurately reflects the policy that all employees receive 10 paid sick days per calendar year, as stated in the source."
+      },
+      "judge_error": null,
+      "error": null
+    },
+    {
+      "question_id": "q2",
+      "question": "Within how many hours must system access be revoked after an employee's termination is processed by HR?",
+      "answer": "System access must be revoked within **4 hours** of an employee\u2019s termination being processed by HR. [1]",
+      "retrieval": {
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.2,
+        "mrr": 1.0
+      },
+      "citation": {
+        "citation_accuracy": 1.0,
+        "num_citations": 1
+      },
+      "system": {
+        "latency_ms": 1215.192899981048,
+        "approx_prompt_tokens": 1471,
+        "approx_completion_tokens": 23
+      },
+      "answer_judge": {
+        "correctness": 5.0,
+        "relevance": 5.0,
+        "completeness": 5.0,
+        "rationale": "The system answer matches the reference answer exactly in content, relevance, and completeness."
+      },
+      "grounding_judge": null,
+      "judge_error": "Groq API request failed: 429 Client Error: Too Many Requests for url: https://api.groq.com/openai/v1/chat/completions. {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-20b` in organization `org_01m2nav5m4e919xnpv1e1ywprt` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6920, Requested 1692. Please try again in 4.59s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}\n",
+      "error": null
+    }
+  ],
+  "meta": {
+    "ran_at": "2026-10-04T18:59:01.518552+00:00",
+    "top_k": 5,
+    "llm_judges": true,
+    "num_questions": 2,
+    "dataset_hash": "631ab24d",
+    "embedder": "SentenceTransformerEmbedder",
+    "reranker": null,
+    "llm_model": "openai/gpt-oss-20b"
+  }
+}

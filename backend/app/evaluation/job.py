@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Callable
 
 from app.core.config import Settings
-from app.core.dependencies import load_pipeline_for, with_top_k
+from app.core.dependencies import load_pipeline_for, prepare_pipeline, with_top_k
 from app.core.logging import get_logger
 from app.evaluation.dataset import EvalDataset
 from app.evaluation.runner import EvaluationReport, EvaluationRunner
@@ -30,6 +30,27 @@ def write_json_atomic(path: Path, data: dict) -> None:
     os.replace(tmp, path)
 
 
+def make_runner(pipeline, settings: Settings, run_llm_judges: bool) -> EvaluationRunner:
+    answer_evaluator = grounding_evaluator = None
+    if run_llm_judges:
+        try:
+            from app.evaluation.evaluators.answer import AnswerEvaluator
+            from app.evaluation.evaluators.grounding import GroundingEvaluator
+            from app.generation.llm import GroqClient
+
+            client = GroqClient(settings)
+            answer_evaluator, grounding_evaluator = AnswerEvaluator(client), GroundingEvaluator(client)
+        except Exception as exc:
+            logger.warning("Disabling LLM-judge metrics (%s)", exc)
+            run_llm_judges = False
+    return EvaluationRunner(
+        pipeline,
+        answer_evaluator=answer_evaluator,
+        grounding_evaluator=grounding_evaluator,
+        run_llm_judges=run_llm_judges,
+    )
+
+
 def run_evaluation_job(
     report: ReportFn,
     combos: list[tuple[str, str]],
@@ -47,14 +68,14 @@ def run_evaluation_job(
     for chunking, retrieval in combos:
         name = f"{chunking}_{retrieval}"
         try:
-            pipeline = with_top_k(load_pipeline_for(chunking, retrieval), top_k)
+            pipeline = with_top_k(prepare_pipeline(load_pipeline_for(chunking, retrieval, settings), settings), top_k)
         except FileNotFoundError as exc:
             skipped[name] = str(exc)
             done += len(dataset)
             report(done / total, f"Skipped {name} (index not built)")
             continue
 
-        runner = EvaluationRunner(pipeline, run_llm_judges=run_llm_judges)
+        runner = make_runner(pipeline, settings, run_llm_judges)
         eval_report = EvaluationReport(strategy_name=pipeline.strategy.name)
         for i, question in enumerate(dataset.questions, start=1):
             report(done / total, f"{name}: question {i} of {len(dataset)}")

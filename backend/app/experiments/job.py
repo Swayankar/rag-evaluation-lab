@@ -4,10 +4,10 @@ from datetime import datetime, timezone
 from typing import Callable
 
 from app.core.config import Settings
-from app.core.dependencies import load_pipeline_for
+from app.core.dependencies import load_pipeline_for, prepare_pipeline
 from app.core.logging import get_logger
 from app.evaluation.dataset import EvalDataset
-from app.evaluation.job import dataset_hash, write_json_atomic
+from app.evaluation.job import dataset_hash, make_runner, write_json_atomic
 from app.evaluation.runner import EvaluationReport, EvaluationRunner
 from app.experiments.comparison import compare, count_wins
 from app.pipelines.rag_pipeline import RAGPipeline
@@ -18,8 +18,8 @@ logger = get_logger(__name__)
 ReportFn = Callable[[float, str], None]
 
 
-def _pipeline_for(cfg: StrategyConfig) -> RAGPipeline:
-    base = load_pipeline_for(cfg.chunking_strategy, cfg.retrieval_strategy)
+def _pipeline_for(cfg: StrategyConfig, settings: Settings) -> RAGPipeline:
+    base = prepare_pipeline(load_pipeline_for(cfg.chunking_strategy, cfg.retrieval_strategy, settings), settings)
     clone = copy.copy(base)
     clone.strategy = dataclasses.replace(base.strategy, name=cfg.name, top_k=cfg.top_k)
     return clone
@@ -43,14 +43,14 @@ def run_experiments_job(
 
     for cfg in strategies:
         try:
-            pipeline = _pipeline_for(cfg)
+            pipeline = _pipeline_for(cfg, settings)
         except FileNotFoundError as exc:
             skipped[cfg.name] = str(exc)
             done += len(dataset)
             report(done / total, f"Skipped {cfg.name} (index not built)")
             continue
 
-        runner = EvaluationRunner(pipeline, run_llm_judges=run_llm_judges)
+        runner = make_runner(pipeline, settings, run_llm_judges)
         judges_used = runner.run_llm_judges
         eval_report = EvaluationReport(strategy_name=cfg.name)
         for i, question in enumerate(dataset.questions, start=1):

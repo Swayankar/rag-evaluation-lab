@@ -13,6 +13,8 @@ import Documents from "./pages/Documents.jsx";
 const Evaluation = lazy(() => import("./pages/Evaluation.jsx"));
 const Experiments = lazy(() => import("./pages/Experiments.jsx"));
 import { ConfigBadge } from "./components/ConfigPanel.jsx";
+import WorkspaceBar from "./components/WorkspaceBar.jsx";
+import { useWorkspace } from "./context/WorkspaceContext.jsx";
 
 const NAV = [
   { to: "/", label: "Home", end: true },
@@ -32,6 +34,7 @@ const TITLES = {
 
 export default function App() {
   const { pathname } = useLocation();
+  const { scope, hasKey } = useWorkspace();
   useEffect(() => {
     const page = TITLES[pathname];
     document.title =
@@ -64,10 +67,11 @@ export default function App() {
             </NavLink>
           ))}
         </div>
-        <ConfigBadge />
+        <ConfigBadge key={`${scope}:${hasKey}`} />
       </nav>
+      <WorkspaceBar />
       <main className="content" id="main" tabIndex={-1}>
-        <ErrorBoundary key={pathname}>
+        <ErrorBoundary key={`${pathname}:${scope}`}>
           <Suspense fallback={<div className="muted">Loading…</div>}>
             <Routes>
               <Route path="/" element={<Home />} />

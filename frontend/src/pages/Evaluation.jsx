@@ -2,10 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import ResultsView from "../components/ResultsView.jsx";
 import EvalRunPanel from "../components/EvalRunPanel.jsx";
 import QuestionEditor from "../components/QuestionEditor.jsx";
+import ReadOnly from "../components/ReadOnly.jsx";
+import { useWorkspace } from "../context/WorkspaceContext.jsx";
 import { api } from "../services/api.js";
 import { useJob } from "../hooks/useJob.js";
 
 export default function Evaluation() {
+  const { readOnly } = useWorkspace();
   const [tab, setTab] = useState("results");
   const [results, setResults] = useState(null);
   const [questions, setQuestions] = useState(null);
@@ -119,32 +122,40 @@ export default function Evaluation() {
         <ResultsView
           results={results}
           onGoRun={() => setTab("run")}
-          onDelete={async (name) => {
-            await api.deleteEvalResult(name);
-            loadResults();
-          }}
+          onDelete={
+            readOnly
+              ? undefined
+              : async (name) => {
+                  await api.deleteEvalResult(name);
+                  loadResults();
+                }
+          }
         />
       )}
 
       {tab === "run" && questions && (
-        <EvalRunPanel
-          numQuestions={numQuestions}
-          job={job}
-          onStart={start}
-          starting={starting}
-          onGoQuestions={() => setTab("questions")}
-        />
+        <ReadOnly>
+          <EvalRunPanel
+            numQuestions={numQuestions}
+            job={job}
+            onStart={start}
+            starting={starting}
+            onGoQuestions={() => setTab("questions")}
+          />
+        </ReadOnly>
       )}
 
       {questions && (
         <div hidden={tab !== "questions"}>
-          <QuestionEditor
-            initial={questions}
-            onSaved={() => {
-              loadQuestions();
-              loadResults();
-            }}
-          />
+          <ReadOnly>
+            <QuestionEditor
+              initial={questions}
+              onSaved={() => {
+                loadQuestions();
+                loadResults();
+              }}
+            />
+          </ReadOnly>
         </div>
       )}
 

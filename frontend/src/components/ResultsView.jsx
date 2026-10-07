@@ -284,18 +284,20 @@ export default function ResultsView({ results, onDelete, onGoRun }) {
                     )}
                   </td>
                   <td>
-                    <button
-                      type="button"
-                      className="icon-btn"
-                      title="Delete this saved run"
-                      onClick={() =>
-                        window.confirm(
-                          `Delete the saved run for ${prettyName(r.name)}?`,
-                        ) && onDelete(r.name)
-                      }
-                    >
-                      🗑
-                    </button>
+                    {onDelete && (
+                      <button
+                        type="button"
+                        className="icon-btn"
+                        title="Delete this saved run"
+                        onClick={() =>
+                          window.confirm(
+                            `Delete the saved run for ${prettyName(r.name)}?`,
+                          ) && onDelete(r.name)
+                        }
+                      >
+                        🗑
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

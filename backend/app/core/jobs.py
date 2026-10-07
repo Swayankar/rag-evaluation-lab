@@ -14,10 +14,15 @@ class JobAlreadyRunning(RuntimeError):
     pass
 
 
+class JobCapacityReached(RuntimeError):
+    """Too many jobs are running server-wide right now."""
+
+
 @dataclass
 class Job:
     id: str
     kind: str
+    owner: str = ""
     status: str = "queued"  # queued | running | succeeded | failed
     progress: float = 0.0  # 0.0 - 1.0
     message: str = ""
@@ -28,19 +33,30 @@ class Job:
 
 
 class JobStore:
-    MAX_KEPT = 20
+    MAX_KEPT = 200
 
     def __init__(self) -> None:
         self._jobs: dict[str, Job] = {}
         self._lock = threading.RLock()
 
-    def start(self, kind: str, target: Callable[[ReportFn], dict | None]) -> dict:
+    def start(
+        self,
+        kind: str,
+        target: Callable[[ReportFn], dict | None],
+        owner: str = "",
+        max_active: int | None = None,
+    ) -> dict:
         """Run `target(report)` in a background thread. `report(progress, message)`
-        updates the job. Raises JobAlreadyRunning if one of this kind is active."""
+        updates the job. Raises JobAlreadyRunning if this owner already has one of
+        this kind active, JobCapacityReached if `max_active` jobs are running."""
         with self._lock:
-            if self.is_running(kind):
+            if self.is_running(kind, owner):
                 raise JobAlreadyRunning(f"A {kind} job is already running.")
-            job = Job(id=uuid.uuid4().hex[:12], kind=kind)
+            if max_active is not None and self.active_count() >= max_active:
+                raise JobCapacityReached(
+                    "The server is busy running other people's jobs right now — try again in a minute."
+                )
+            job = Job(id=uuid.uuid4().hex[:12], kind=kind, owner=owner)
             self._jobs[job.id] = job
             self._prune()
             snapshot = asdict(job)
@@ -71,18 +87,36 @@ class JobStore:
             job.result = result
             job.finished_at = time.time()
 
-    def is_running(self, kind: str) -> bool:
+    def is_running(self, kind: str, owner: str | None = None) -> bool:
+        """owner=None matches any owner."""
         with self._lock:
-            return any(j.kind == kind and j.status in ("queued", "running") for j in self._jobs.values())
+            return any(
+                j.kind == kind and (owner is None or j.owner == owner) and j.status in ("queued", "running")
+                for j in self._jobs.values()
+            )
 
-    def get(self, job_id: str) -> dict | None:
+    def owner_busy(self, owner: str) -> bool:
+        with self._lock:
+            return any(j.owner == owner and j.status in ("queued", "running") for j in self._jobs.values())
+
+    def active_count(self) -> int:
+        with self._lock:
+            return sum(1 for j in self._jobs.values() if j.status in ("queued", "running"))
+
+    def get(self, job_id: str, owner: str | None = None) -> dict | None:
+        """With `owner`, a job belonging to someone else looks like it doesn't exist."""
         with self._lock:
             job = self._jobs.get(job_id)
-            return asdict(job) if job else None
+            if job is None or (owner is not None and job.owner != owner):
+                return None
+            return asdict(job)
 
-    def list(self, kind: str | None = None) -> list[dict]:
+    def list(self, kind: str | None = None, owner: str | None = None) -> list[dict]:
         with self._lock:
-            jobs = [j for j in self._jobs.values() if kind is None or j.kind == kind]
+            jobs = [
+                j for j in self._jobs.values()
+                if (kind is None or j.kind == kind) and (owner is None or j.owner == owner)
+            ]
             return [asdict(j) for j in sorted(jobs, key=lambda j: j.created_at, reverse=True)]
 
     def _prune(self) -> None:

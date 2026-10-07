@@ -1,0 +1,31 @@
+{
+  "questions": [
+    {
+      "id": "q1",
+      "question": "How many paid sick days are employees entitled to per calendar year?",
+      "relevant_document_ids": [
+        "sick_leave_policy"
+      ],
+      "expected_answer": "Employees receive 10 paid sick days per calendar year.",
+      "expected_keywords": [
+        "ten",
+        "paid sick days"
+      ],
+      "category": "HR"
+    },
+    {
+      "id": "q2",
+      "question": "Within how many hours must system access be revoked after an employee's termination is processed by HR?",
+      "relevant_document_ids": [
+        "access_control_policy"
+      ],
+      "expected_answer": "All system access must be revoked within 4 hours of an employee's termination being processed by HR.",
+      "expected_keywords": [
+        "four hours",
+        "revoked",
+        "termination"
+      ],
+      "category": "IT"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import threading
 from app.core.logging import get_logger
 from app.models.query import RetrievedChunk
 from app.retrieval.base import BaseRetriever
@@ -36,15 +37,25 @@ class NoOpReranker:
         return candidates[:top_k]
 
 
+_cross_encoder_cache: dict[str, CrossEncoderReranker] = {}
+_cross_encoder_lock = threading.Lock()
+
+
 def get_reranker(model_name: str = DEFAULT_RERANKER_MODEL):
-    try:
-        return CrossEncoderReranker(model_name)
-    except Exception as exc:  # noqa: BLE001 - deliberate broad fallback
-        logger.warning(
-            "Falling back to NoOpReranker — cross-encoder unavailable (%s). ",
-            exc,
-        )
-        return NoOpReranker()
+    with _cross_encoder_lock:
+        cached = _cross_encoder_cache.get(model_name)
+        if cached is not None:
+            return cached
+        try:
+            reranker = CrossEncoderReranker(model_name)
+        except Exception as exc:
+            logger.warning(
+                "Falling back to NoOpReranker — cross-encoder unavailable (%s). ",
+                exc,
+            )
+            return NoOpReranker()
+        _cross_encoder_cache[model_name] = reranker
+        return reranker
 
 
 class RerankingRetriever(BaseRetriever):

@@ -1,0 +1,87 @@
+{
+  "strategy": "experiment_5_semantic_hybrid_rerank",
+  "aggregate": {
+    "num_questions": 2,
+    "avg_recall_at_k": 1.0,
+    "avg_precision_at_k": 0.2,
+    "avg_mrr": 1.0,
+    "avg_latency_ms": 2450.738950021332,
+    "avg_prompt_tokens": 1403.0,
+    "avg_citation_accuracy": 1.0,
+    "avg_correctness": 5.0,
+    "avg_relevance": 5.0,
+    "avg_completeness": 5.0,
+    "avg_faithfulness": 5.0,
+    "hallucination_rate": 0.0,
+    "num_judge_errors": 1
+  },
+  "results": [
+    {
+      "question_id": "q1",
+      "question": "How many paid sick days are employees entitled to per calendar year?",
+      "answer": "All employees receive 10 paid sick days per calendar year [1].",
+      "retrieval": {
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.2,
+        "mrr": 1.0
+      },
+      "citation": {
+        "citation_accuracy": 1.0,
+        "num_citations": 1
+      },
+      "system": {
+        "latency_ms": 2482.0440000039525,
+        "approx_prompt_tokens": 1414,
+        "approx_completion_tokens": 14
+      },
+      "answer_judge": {
+        "correctness": 5.0,
+        "relevance": 5.0,
+        "completeness": 5.0,
+        "rationale": "The system's answer accurately and completely states the same fact as the reference answer while directly addressing the question."
+      },
+      "grounding_judge": {
+        "faithfulness": 5.0,
+        "likely_hallucination": false,
+        "rationale": "The statement directly matches the text in the Sick Leave Policy stating 'All employees receive 10 paid sick days per calendar year'."
+      },
+      "judge_error": null,
+      "error": null
+    },
+    {
+      "question_id": "q2",
+      "question": "Within how many hours must system access be revoked after an employee's termination is processed by HR?",
+      "answer": "System access must be revoked within 4 hours of an employee's termination being processed by HR [1].",
+      "retrieval": {
+        "recall_at_k": 1.0,
+        "precision_at_k": 0.2,
+        "mrr": 1.0
+      },
+      "citation": {
+        "citation_accuracy": 1.0,
+        "num_citations": 1
+      },
+      "system": {
+        "latency_ms": 2419.4339000387117,
+        "approx_prompt_tokens": 1392,
+        "approx_completion_tokens": 21
+      },
+      "answer_judge": null,
+      "grounding_judge": null,
+      "judge_error": "Groq API request failed: 429 Client Error: Too Many Requests for url: https://generativelanguage.googleapis.com/v1beta/openai/chat/completions. [{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 15, model: gemini-3.5-flash-lite\\nPlease retry in 23.648163609s.\",\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.Help\",\n        \"links\": [\n          {\n            \"description\": \"Learn more about Gemini API quotas\",\n            \"url\": \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.QuotaFailure\",\n        \"violations\": [\n          {\n            \"quotaMetric\": \"generativelanguage.googleapis.com/generate_content_free_tier_requests\",\n            \"quotaId\": \"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\",\n            \"quotaDimensions\": {\n              \"model\": \"gemini-3.5-flash-lite\",\n              \"location\": \"global\"\n            },\n            \"quotaValue\": \"15\"\n          }\n        ]\n      },\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.RetryInfo\",\n        \"retryDelay\": \"23s\"\n      }\n    ]\n  }\n}\n]",
+      "error": null
+    }
+  ],
+  "meta": {
+    "ran_at": "2026-10-07T08:29:35.290160+00:00",
+    "chunking_strategy": "semantic",
+    "retrieval_strategy": "hybrid_rerank",
+    "top_k": 5,
+    "llm_judges": true,
+    "num_questions": 2,
+    "dataset_hash": "631ab24d",
+    "embedder": "SentenceTransformerEmbedder",
+    "reranker": "CrossEncoderReranker",
+    "llm_model": "gemini-3.5-flash-lite"
+  }
+}

@@ -3,14 +3,30 @@ const BASE = (import.meta.env.VITE_API_URL ?? "http://localhost:8000").replace(
   "",
 );
 
+import {
+  getGroqKey,
+  getModel,
+  getWorkspaceId,
+  setWorkspaceId,
+} from "./workspace.js";
+
 async function request(path, { method = "GET", body, signal } = {}) {
   const isForm = typeof FormData !== "undefined" && body instanceof FormData;
+  const workspace = getWorkspaceId();
+  const headers = {};
+  if (body && !isForm) headers["Content-Type"] = "application/json";
+  if (workspace) headers["X-Workspace"] = workspace;
+  const key = getGroqKey();
+  if (key) headers["X-Groq-Key"] = key;
+  const model = getModel();
+  if (model) headers["X-Groq-Model"] = model;
+
   let response;
   try {
     response = await fetch(`${BASE}${path}`, {
       method,
-      headers:
-        body && !isForm ? { "Content-Type": "application/json" } : undefined,
+      headers,
+      cache: "no-store",
       body: body ? (isForm ? body : JSON.stringify(body)) : undefined,
       signal,
     });
@@ -34,6 +50,7 @@ async function request(path, { method = "GET", body, signal } = {}) {
     }
     const error = new Error(detail);
     error.status = response.status;
+    if (response.status === 410 && workspace) setWorkspaceId(null);
     throw error;
   }
   return response.json();
@@ -73,18 +90,7 @@ export const api = {
   questions: (signal) => request("/evaluation/questions", { signal }),
   saveQuestions: (questions) =>
     request("/evaluation/questions", { method: "PUT", body: { questions } }),
-  createStarterQuestions: () =>
-    request("/evaluation/questions/starter", { method: "POST" }),
-  evalRuns: (signal) => request("/evaluation/results", { signal }),
-  evalRun: (source, name, signal) =>
-    request(
-      `/evaluation/results/${encodeURIComponent(source)}/${encodeURIComponent(name)}`,
-      { signal },
-    ),
 
-  questions: (signal) => request("/evaluation/questions", { signal }),
-  saveQuestions: (questions) =>
-    request("/evaluation/questions", { method: "PUT", body: { questions } }),
   runEvaluation: (body) => request("/evaluation/run", { method: "POST", body }),
   evalResults: (signal) => request("/evaluation/results", { signal }),
   evalResult: (name, signal) =>
@@ -102,6 +108,14 @@ export const api = {
     request("/experiments/run", { method: "POST", body }),
   experimentDetail: (name, signal) =>
     request(`/experiments/${encodeURIComponent(name)}`, { signal }),
+
+  currentWorkspace: (signal) => request("/workspaces/current", { signal }),
+  createWorkspace: (copySample) =>
+    request("/workspaces", {
+      method: "POST",
+      body: { copy_sample: Boolean(copySample) },
+    }),
+  deleteWorkspace: (id) => request(`/workspaces/${id}`, { method: "DELETE" }),
 
   job: (id, signal) => request(`/jobs/${id}`, { signal }),
   jobs: (kind, signal) =>

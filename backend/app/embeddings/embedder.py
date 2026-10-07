@@ -12,8 +12,12 @@ Two backends:
 
 get_embedder() picks the right one based on settings and falls back
 automatically, logging a warning when it does.
+
+The real model is loaded ONCE per process and shared: with many workspaces each
+holding several pipelines, loading it per pipeline would cost ~100 MB apiece.
 """
 import hashlib
+import threading
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -67,19 +71,29 @@ class SentenceTransformerEmbedder(BaseEmbedder):
         return np.asarray(embeddings, dtype=np.float32)
 
 
+_st_cache: dict[str, SentenceTransformerEmbedder] = {}
+_st_lock = threading.Lock()
+
+
 def get_embedder(settings: Settings | None = None) -> BaseEmbedder:
     settings = settings or get_settings()
 
     if settings.embedding_backend == "hashing":
         return HashingEmbedder()
 
-    try:
-        return SentenceTransformerEmbedder(settings.embedding_model_name)
-    except Exception as exc:  # noqa: BLE001 - deliberate broad fallback
-        logger.warning(
-            "Falling back to HashingEmbedder — sentence-transformers unavailable "
-            "(%s). Install it with `pip install -e \".[embeddings]\"` for real "
-            "semantic embeddings.",
-            exc,
-        )
-        return HashingEmbedder()
+    with _st_lock:
+        cached = _st_cache.get(settings.embedding_model_name)
+        if cached is not None:
+            return cached
+        try:
+            embedder = SentenceTransformerEmbedder(settings.embedding_model_name)
+        except Exception as exc:
+            logger.warning(
+                "Falling back to HashingEmbedder — sentence-transformers unavailable "
+                "(%s). Install it with `pip install -e \".[embeddings]\"` for real "
+                "semantic embeddings.",
+                exc,
+            )
+            return HashingEmbedder()
+        _st_cache[settings.embedding_model_name] = embedder
+        return embedder

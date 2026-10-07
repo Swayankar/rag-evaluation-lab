@@ -3,6 +3,7 @@ import DocumentList from "../components/DocumentList.jsx";
 import UploadForm from "../components/UploadForm.jsx";
 import RebuildPanel from "../components/RebuildPanel.jsx";
 import ResetPanel from "../components/ResetPanel.jsx";
+import ReadOnly from "../components/ReadOnly.jsx";
 import { api } from "../services/api.js";
 import { useJob } from "../hooks/useJob.js";
 
@@ -121,57 +122,61 @@ export default function Documents() {
 
       {actionError && <div className="notice notice-error">{actionError}</div>}
 
-      <RebuildPanel
-        index={library.index}
-        job={job}
-        onStart={startRebuild}
-        starting={starting}
-      />
+      <ReadOnly>
+        <RebuildPanel
+          index={library.index}
+          job={job}
+          onStart={startRebuild}
+          starting={starting}
+        />
 
-      <div className="two-col">
-        <div className="col">
-          <form className="folder-form" onSubmit={addFolder}>
-            <input
-              className="text-input"
-              placeholder="Add a folder, e.g. finance"
-              value={folderName}
-              onChange={(e) => setFolderName(e.target.value)}
+        <div className="two-col">
+          <div className="col">
+            <form className="folder-form" onSubmit={addFolder}>
+              <input
+                className="text-input"
+                placeholder="Add a folder, e.g. finance"
+                value={folderName}
+                onChange={(e) => setFolderName(e.target.value)}
+                disabled={rebuilding}
+              />
+              <button
+                type="submit"
+                className="btn btn-secondary"
+                disabled={rebuilding || !folderName.trim()}
+              >
+                Add folder
+              </button>
+            </form>
+            <DocumentList
+              departments={library.departments}
+              disabled={rebuilding}
+              onDelete={async (dept, file) => {
+                await guard(() => api.deleteDocument(dept, file)).catch(
+                  () => {},
+                );
+                await refresh();
+              }}
+              onDeleteFolder={async (name) => {
+                await guard(() => api.deleteFolder(name)).catch(() => {});
+                await refresh();
+              }}
+            />
+          </div>
+          <div className="col">
+            <UploadForm
+              departments={library.departments}
+              onUpload={upload}
               disabled={rebuilding}
             />
-            <button
-              type="submit"
-              className="btn btn-secondary"
-              disabled={rebuilding || !folderName.trim()}
-            >
-              Add folder
-            </button>
-          </form>
-          <DocumentList
-            departments={library.departments}
-            disabled={rebuilding}
-            onDelete={async (dept, file) => {
-              await guard(() => api.deleteDocument(dept, file)).catch(() => {});
-              await refresh();
-            }}
-            onDeleteFolder={async (name) => {
-              await guard(() => api.deleteFolder(name)).catch(() => {});
-              await refresh();
-            }}
-          />
+            <ResetPanel
+              onReset={resetLibrary}
+              disabled={rebuilding}
+              documentCount={library.total_documents}
+            />
+          </div>
         </div>
-        <div className="col">
-          <UploadForm
-            departments={library.departments}
-            onUpload={upload}
-            disabled={rebuilding}
-          />
-          <ResetPanel
-            onReset={resetLibrary}
-            disabled={rebuilding}
-            documentCount={library.total_documents}
-          />
-        </div>
-      </div>
+      </ReadOnly>
     </div>
   );
 }

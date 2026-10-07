@@ -204,7 +204,7 @@ def test_run_is_blocked_while_another_job_runs(env):
     _questions(client)
     import threading
     release = threading.Event()
-    job_store.start("evaluation", lambda report: release.wait(5) and None)
+    job_store.start("evaluation", lambda report: release.wait(5) and None, owner="sample")
     try:
         r = client.post("/experiments/run")
         assert r.status_code == 409 and "evaluation" in r.json()["detail"]
@@ -244,7 +244,7 @@ def test_run_job_writes_details_and_comparison_and_skips_missing_indexes(tmp_pat
 
     class FakeEmbedder: ...
 
-    def fake_pipeline(cfg):
+    def fake_pipeline(cfg, settings=None):
         if cfg.name == "no_index":
             raise FileNotFoundError("semantic index not built")
         return types.SimpleNamespace(strategy=cfg, embedder=FakeEmbedder(), retriever=types.SimpleNamespace())
@@ -271,7 +271,7 @@ def test_run_job_writes_details_and_comparison_and_skips_missing_indexes(tmp_pat
 
     monkeypatch.setattr(job_module, "_pipeline_for", fake_pipeline)
     monkeypatch.setattr(job_module, "EvaluationReport", FakeReport)
-    monkeypatch.setattr(job_module, "EvaluationRunner", FakeRunner)
+    monkeypatch.setattr(job_module, "make_runner", lambda pipeline, settings, judges: FakeRunner(pipeline, run_llm_judges=judges))
 
     progress = []
     result = job_module.run_experiments_job(
@@ -300,7 +300,7 @@ def test_run_job_fails_clearly_when_nothing_can_run(tmp_path, monkeypatch):
     from app.experiments import job as job_module
     from app.pipelines.strategy import StrategyConfig
 
-    def boom(cfg):
+    def boom(cfg, settings=None):
         raise FileNotFoundError("no index")
 
     monkeypatch.setattr(job_module, "_pipeline_for", boom)

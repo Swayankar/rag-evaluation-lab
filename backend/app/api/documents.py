@@ -8,8 +8,9 @@ from typing import Literal
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
-from app.core.config import Settings, get_settings
-from app.core.jobs import JobAlreadyRunning, job_store
+from app.core.config import Settings
+from app.core.jobs import JobAlreadyRunning, JobCapacityReached, job_store
+from app.core.workspaces import enforce_upload_limits, workspace_settings
 from app.models.schemas import DocumentsResponse, DocumentSummary
 
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -42,8 +43,8 @@ def _dept_dir(settings: Settings, department: str) -> Path:
     return path
 
 
-def _ensure_not_rebuilding() -> None:
-    if job_store.is_running("rebuild"):
+def _ensure_not_rebuilding(settings: Settings) -> None:
+    if job_store.is_running("rebuild", settings.workspace_id):
         raise HTTPException(status_code=409, detail="An index rebuild is running — wait for it to finish.")
 
 
@@ -69,7 +70,7 @@ def _read_chunks(settings: Settings, chunking: str) -> list[dict] | None:
 # --------------------------------------------------------------------------
 
 @router.get("", response_model=DocumentsResponse)
-def list_documents(settings: Settings = Depends(get_settings)) -> DocumentsResponse:
+def list_documents(settings: Settings = Depends(workspace_settings)) -> DocumentsResponse:
     chunks_path = settings.chunks_path_for("fixed")
     if not chunks_path.exists():
         raise HTTPException(
@@ -107,7 +108,7 @@ def list_documents(settings: Settings = Depends(get_settings)) -> DocumentsRespo
 # --------------------------------------------------------------------------
 
 @router.get("/library")
-def library(settings: Settings = Depends(get_settings)) -> dict:
+def library(settings: Settings = Depends(workspace_settings)) -> dict:
     root = settings.raw_docs_path
     fixed_chunks = _read_chunks(settings, "fixed")
     chunk_counts: dict[str, int] = {}
@@ -170,7 +171,7 @@ def library(settings: Settings = Depends(get_settings)) -> dict:
             "last_built": datetime.fromtimestamp(index_mtime, tz=timezone.utc).isoformat() if index_mtime else None,
             "total_chunks": len(fixed_chunks or []),
         },
-        "rebuild_running": job_store.is_running("rebuild"),
+        "rebuild_running": job_store.is_running("rebuild", settings.workspace_id),
     }
 
 
@@ -183,8 +184,8 @@ class FolderCreate(BaseModel):
 
 
 @router.post("/folders", status_code=201)
-def create_folder(body: FolderCreate, settings: Settings = Depends(get_settings)) -> dict:
-    _ensure_not_rebuilding()
+def create_folder(body: FolderCreate, settings: Settings = Depends(workspace_settings)) -> dict:
+    _ensure_not_rebuilding(settings)
     name = _normalize_department(body.name)
     path = _dept_dir(settings, name)
     if path.exists():
@@ -194,8 +195,8 @@ def create_folder(body: FolderCreate, settings: Settings = Depends(get_settings)
 
 
 @router.delete("/folders/{name}")
-def delete_folder(name: str, settings: Settings = Depends(get_settings)) -> dict:
-    _ensure_not_rebuilding()
+def delete_folder(name: str, settings: Settings = Depends(workspace_settings)) -> dict:
+    _ensure_not_rebuilding(settings)
     path = _dept_dir(settings, _normalize_department(name))
     if not path.is_dir():
         raise HTTPException(status_code=404, detail="Folder not found.")
@@ -213,9 +214,9 @@ def delete_folder(name: str, settings: Settings = Depends(get_settings)) -> dict
 def upload_documents(
     department: str = Form(...),
     files: list[UploadFile] = File(...),
-    settings: Settings = Depends(get_settings),
+    settings: Settings = Depends(workspace_settings),
 ) -> dict:
-    _ensure_not_rebuilding()
+    _ensure_not_rebuilding(settings)
     dept = _normalize_department(department)
     target = _dept_dir(settings, dept)
 
@@ -238,12 +239,18 @@ def upload_documents(
             )
             continue
 
-        data = upload.file.read(MAX_UPLOAD_BYTES + 1)
-        if len(data) > MAX_UPLOAD_BYTES:
-            reject(f"File is larger than {MAX_UPLOAD_BYTES // (1024 * 1024)} MB.")
+        max_bytes = (settings.max_upload_mb if not settings.is_sample else MAX_UPLOAD_BYTES // (1024 * 1024)) * 1024 * 1024
+        data = upload.file.read(max_bytes + 1)
+        if len(data) > max_bytes:
+            reject(f"File is larger than {max_bytes // (1024 * 1024)} MB.")
             continue
         if not data.startswith(b"%PDF"):
             reject("This doesn't look like a real PDF.")
+            continue
+        try:
+            enforce_upload_limits(settings, len(data))
+        except HTTPException as exc:
+            reject(str(exc.detail))
             continue
 
         target.mkdir(parents=True, exist_ok=True)
@@ -257,8 +264,8 @@ def upload_documents(
 
 
 @router.delete("/{department}/{filename}")
-def delete_document(department: str, filename: str, settings: Settings = Depends(get_settings)) -> dict:
-    _ensure_not_rebuilding()
+def delete_document(department: str, filename: str, settings: Settings = Depends(workspace_settings)) -> dict:
+    _ensure_not_rebuilding(settings)
     if not _FILENAME_RE.match(filename):
         raise HTTPException(status_code=400, detail="Invalid file name.")
     folder = _dept_dir(settings, department)
@@ -278,19 +285,26 @@ class RebuildRequest(BaseModel):
 
 
 @router.post("/rebuild", status_code=202)
-def rebuild(body: RebuildRequest | None = None, settings: Settings = Depends(get_settings)) -> dict:
+def rebuild(body: RebuildRequest | None = None, settings: Settings = Depends(workspace_settings)) -> dict:
     from app.ingestion.index_builder import rebuild_index  # lazy: pulls in the embedding stack
 
     chunking = (body.chunking if body else None) or ["fixed", "semantic"]
     bad = [c for c in chunking if c not in ("fixed", "semantic")]
     if bad:
         raise HTTPException(status_code=400, detail=f"Unknown chunking strategy: {bad}")
-    if job_store.is_running("evaluation") or job_store.is_running("experiments"):
+    if job_store.is_running("evaluation", settings.workspace_id) or job_store.is_running("experiments", settings.workspace_id):
         raise HTTPException(status_code=409, detail="An evaluation or experiment run is in progress — wait for it to finish.")
     try:
-        return job_store.start("rebuild", lambda report: rebuild_index(report, chunking, settings))
+        return job_store.start(
+            "rebuild",
+            lambda report: rebuild_index(report, chunking, settings),
+            owner=settings.workspace_id,
+            max_active=settings.max_concurrent_jobs,
+        )
     except JobAlreadyRunning as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except JobCapacityReached as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
 
 
 # --------------------------------------------------------------------------
@@ -306,15 +320,15 @@ class ResetRequest(BaseModel):
 
 
 @router.post("/reset")
-def reset_library(body: ResetRequest, settings: Settings = Depends(get_settings)) -> dict:
+def reset_library(body: ResetRequest, settings: Settings = Depends(workspace_settings)) -> dict:
     """Start over: delete every PDF (and, unless keep_folders, every department
     folder) plus the built chunks and vector stores. Evaluation questions and
     past results are left alone unless you ask for them to be cleared too."""
     from app.core.dependencies import clear_pipeline_cache
     from app.ingestion.index_builder import clear_index
 
-    _ensure_not_rebuilding()
-    if job_store.is_running("evaluation") or job_store.is_running("experiments"):
+    _ensure_not_rebuilding(settings)
+    if job_store.is_running("evaluation", settings.workspace_id) or job_store.is_running("experiments", settings.workspace_id):
         raise HTTPException(status_code=409, detail="An evaluation or experiment run is in progress — wait for it to finish.")
 
     root = settings.raw_docs_path.resolve()
@@ -338,7 +352,7 @@ def reset_library(body: ResetRequest, settings: Settings = Depends(get_settings)
                 deleted_files += 1
 
     clear_index(settings)
-    clear_pipeline_cache()
+    clear_pipeline_cache(settings.workspace_id)
 
     cleared = []
     if body.clear_questions and settings.eval_dataset_path.exists():

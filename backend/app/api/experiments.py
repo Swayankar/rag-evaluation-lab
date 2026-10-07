@@ -5,8 +5,9 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from app.core.config import Settings, get_settings
-from app.core.jobs import JobAlreadyRunning, job_store
+from app.core.config import Settings
+from app.core.jobs import JobAlreadyRunning, JobCapacityReached, job_store
+from app.core.workspaces import NO_KEY_MESSAGE, key_missing, workspace_settings
 from app.evaluation.dataset import load_eval_dataset
 from app.evaluation.job import dataset_hash, write_json_atomic
 from app.experiments.recommend import recommend
@@ -40,7 +41,7 @@ def _current_dataset_hash(settings: Settings) -> str | None:
 # --------------------------------------------------------------------------
 
 @router.get("")
-def list_experiments(settings: Settings = Depends(get_settings)) -> dict:
+def list_experiments(settings: Settings = Depends(workspace_settings)) -> dict:
     comparison_path = settings.experiments_results_dir / "comparison_latest.json"
     if not comparison_path.exists():
         raise HTTPException(
@@ -58,7 +59,7 @@ def list_experiments(settings: Settings = Depends(get_settings)) -> dict:
 # --------------------------------------------------------------------------
 
 @router.get("/overview")
-def overview(settings: Settings = Depends(get_settings)) -> dict:
+def overview(settings: Settings = Depends(workspace_settings)) -> dict:
     path = settings.experiments_results_dir / "comparison_latest.json"
     comparison = None
     if path.exists():
@@ -75,7 +76,7 @@ def overview(settings: Settings = Depends(get_settings)) -> dict:
         "current_dataset_hash": current,
         # None = unknown (the CLI script's output carries no dataset hash)
         "dataset_match": (saved == current) if saved and current else None,
-        "running": job_store.is_running("experiments"),
+        "running": job_store.is_running("experiments", settings.workspace_id),
     }
 
 
@@ -112,7 +113,7 @@ def _read_configs(settings: Settings) -> tuple[list[dict], list[str], bool]:
 
 
 @router.get("/configs")
-def get_configs(settings: Settings = Depends(get_settings)) -> dict:
+def get_configs(settings: Settings = Depends(workspace_settings)) -> dict:
     configs, problems, from_files = _read_configs(settings)
     return {
         "experiments": configs,
@@ -124,7 +125,7 @@ def get_configs(settings: Settings = Depends(get_settings)) -> dict:
 
 
 @router.put("/configs")
-def put_configs(body: ConfigsIn, settings: Settings = Depends(get_settings)) -> dict:
+def put_configs(body: ConfigsIn, settings: Settings = Depends(workspace_settings)) -> dict:
     problems: list[str] = []
     seen: set[str] = set()
     for i, cfg in enumerate(body.experiments, start=1):
@@ -137,7 +138,7 @@ def put_configs(body: ConfigsIn, settings: Settings = Depends(get_settings)) -> 
         seen.add(cfg.name)
     if problems:
         raise HTTPException(status_code=422, detail=" ".join(problems))
-    if job_store.is_running("experiments"):
+    if job_store.is_running("experiments", settings.workspace_id):
         raise HTTPException(status_code=409, detail="An experiment run is in progress — wait for it to finish.")
 
     directory = Path(settings.experiments_dir)
@@ -162,7 +163,7 @@ class RunRequest(BaseModel):
 
 
 @router.post("/run", status_code=202)
-def run_experiments(body: RunRequest | None = None, settings: Settings = Depends(get_settings)) -> dict:
+def run_experiments(body: RunRequest | None = None, settings: Settings = Depends(workspace_settings)) -> dict:
     path = settings.eval_dataset_path
     if not path.exists():
         raise HTTPException(status_code=400, detail="There are no evaluation questions yet — add some on the Evaluation page.")
@@ -172,9 +173,11 @@ def run_experiments(body: RunRequest | None = None, settings: Settings = Depends
         raise HTTPException(status_code=422, detail=f"{path} couldn't be parsed: {exc}") from exc
     if len(dataset) == 0:
         raise HTTPException(status_code=400, detail="There are no evaluation questions yet — add some on the Evaluation page.")
-    if job_store.is_running("rebuild"):
+    if key_missing(settings):
+        raise HTTPException(status_code=400, detail=NO_KEY_MESSAGE)
+    if job_store.is_running("rebuild", settings.workspace_id):
         raise HTTPException(status_code=409, detail="An index rebuild is running — wait for it to finish.")
-    if job_store.is_running("evaluation"):
+    if job_store.is_running("evaluation", settings.workspace_id):
         raise HTTPException(status_code=409, detail="An evaluation run is in progress — wait for it to finish.")
 
     from app.experiments.job import run_experiments_job  # lazy: pulls in the pipeline stack
@@ -186,9 +189,13 @@ def run_experiments(body: RunRequest | None = None, settings: Settings = Depends
         return job_store.start(
             "experiments",
             lambda report: run_experiments_job(report, strategies, dataset, settings, judges),
+            owner=settings.workspace_id,
+            max_active=settings.max_concurrent_jobs,
         )
     except JobAlreadyRunning as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except JobCapacityReached as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
 
 
 # --------------------------------------------------------------------------
@@ -196,7 +203,7 @@ def run_experiments(body: RunRequest | None = None, settings: Settings = Depends
 # --------------------------------------------------------------------------
 
 @router.get("/{experiment_name}")
-def get_experiment_detail(experiment_name: str, settings: Settings = Depends(get_settings)) -> dict:
+def get_experiment_detail(experiment_name: str, settings: Settings = Depends(workspace_settings)) -> dict:
     if not _SAFE_NAME_RE.match(experiment_name):
         raise HTTPException(status_code=400, detail="Invalid experiment name.")
 

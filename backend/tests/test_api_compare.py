@@ -15,7 +15,7 @@ from tests.test_api import _build_fake_pipeline  # noqa: E402
 def test_compare_runs_each_strategy_and_isolates_missing_ones(tmp_path, monkeypatch):
     good = _build_fake_pipeline(tmp_path)
 
-    def fake_load(chunking, retrieval):
+    def fake_load(chunking, retrieval, settings=None):
         if chunking == "semantic":
             raise FileNotFoundError("No vector store for semantic")
         return good
@@ -40,7 +40,7 @@ def test_compare_runs_each_strategy_and_isolates_missing_ones(tmp_path, monkeypa
 
 def test_compare_without_strategies_runs_all_eight(tmp_path, monkeypatch):
     good = _build_fake_pipeline(tmp_path)
-    monkeypatch.setattr(query_module, "load_pipeline_for", lambda c, r: good)
+    monkeypatch.setattr(query_module, "load_pipeline_for", lambda c, r, s=None: good)
     response = TestClient(app).post("/query/compare", json={"question": "q"})
     assert response.status_code == 200
     assert len(response.json()["results"]) == 8

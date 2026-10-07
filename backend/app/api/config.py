@@ -1,18 +1,20 @@
 import importlib.util
+import os
 
 from fastapi import APIRouter, Depends
 
-from app.core.config import Settings, get_settings
+from app.core.config import Settings
 from app.core.dependencies import loaded_pipelines
+from app.core.workspaces import workspace_settings
 
 router = APIRouter(prefix="/config", tags=["config"])
 
 
 @router.get("")
-def get_config(settings: Settings = Depends(get_settings)) -> dict:
+def get_config(settings: Settings = Depends(workspace_settings)) -> dict:
     from app.utils import token_counter
 
-    pipelines = loaded_pipelines()
+    pipelines = loaded_pipelines(settings.workspace_id)
     embedders = sorted({type(p.embedder).__name__ for _, p in pipelines})
     rerankers = sorted(
         {type(r).__name__ for _, p in pipelines if (r := getattr(p.retriever, "reranker", None)) is not None}
@@ -32,14 +34,31 @@ def get_config(settings: Settings = Depends(get_settings)) -> dict:
     if tokenizer != "tiktoken":
         warnings.append("tiktoken unavailable — chunk sizes and token counts are approximate.")
     if not settings.groq_api_key:
-        warnings.append("GROQ_API_KEY isn't set — answers and LLM-judge metrics will fail.")
+        if settings.server_key_allowed:
+            warnings.append("GROQ_API_KEY isn't set — answers and LLM-judge metrics will fail.")
+        else:
+            warnings.append("No Groq key — paste yours to ask questions or run evaluations.")
+    if settings.is_hosted and (os.environ.get("LANGCHAIN_TRACING_V2", "").lower() == "true"):
+        warnings.append("LANGCHAIN_TRACING_V2 is set in this server's environment — visitors' prompts and "
+                        "document text may be sent to LangSmith. Unset it for a public deployment.")
 
     return {
         "llm": {
             "provider": "groq",
             "model": settings.groq_model,
             "base_url": settings.groq_base_url,
+            "options": settings.model_choices,
+            "default_model": settings.default_groq_model or settings.groq_model,
+            "model_overridden": settings.model_overridden,
+            "custom_allowed": settings.allow_custom_model and (settings.user_supplied_key or not settings.is_hosted),
             "api_key_configured": bool(settings.groq_api_key),
+            "key_source": "yours" if settings.user_supplied_key else ("server" if settings.groq_api_key else "none"),
+        },
+        "workspace": {
+            "id": settings.workspace_id,
+            "is_sample": settings.is_sample,
+            "read_only": settings.workspace_read_only,
+            "mode": settings.app_mode,
         },
         "embeddings": {
             "configured_backend": settings.embedding_backend,
@@ -57,7 +76,7 @@ def get_config(settings: Settings = Depends(get_settings)) -> dict:
             "semantic_max_chunk_tokens": settings.semantic_max_chunk_tokens,
         },
         "tracing": {
-            "langsmith_enabled": settings.langchain_tracing_v2 and bool(settings.langchain_api_key),
+            "langsmith_enabled": settings.langchain_tracing_v2 and bool(settings.langchain_api_key) and not settings.is_hosted,
             "project": settings.langchain_project,
         },
         "loaded_pipelines": [f"{c}_{r}" for (c, r), _ in pipelines],

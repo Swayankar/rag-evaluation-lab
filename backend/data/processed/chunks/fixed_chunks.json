@@ -1,0 +1,222 @@
+[
+  {
+    "chunk_id": "annual_report_2024_000",
+    "document_id": "annual_report_2024",
+    "document_name": "Annual Report 2024",
+    "department": "Finance",
+    "year": 2024,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Meridian Analytics Inc. — Annual Report, Fiscal Year 2024\nFinancial Highlights\nMeridian Analytics Inc. reported total revenue of $84.2 million for fiscal\nyear 2024, representing a 19% increase over the prior year. Net income was\n$11.6 million, up from $8.9 million in FY2023, driven primarily by growth in\nthe company's enterprise data analytics segment.\nSegment Performance\nThe Enterprise Analytics segment contributed $52.3 million in revenue, while\nthe Consulting Services segment contributed $31.9 million. Enterprise\nAnalytics grew 27% year-over-year, outpacing Consulting Services growth of\n8%.\nOperating Expenses\nTotal operating expenses were $68.1 million, including $22.4 million in\nresearch and development, $18.7 million in sales and marketing, and $14.3\nmillion in general and administrative costs.\nHeadcount\nThe company ended FY2024 with 612 full-time employees, an increase of 84 from\nthe prior year, with the largest growth in the Engineering and Data Science\ndepartments.\nOutlook\nManagement expects FY2025 revenue growth in the range of 15% to 20%, driven\nby continued expansion of the Enterprise Analytics product line and planned\nentry into the European market in the second half of the fiscal year."
+  },
+  {
+    "chunk_id": "annual_report_2025_000",
+    "document_id": "annual_report_2025",
+    "document_name": "Annual Report 2025",
+    "department": "Finance",
+    "year": 2025,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Meridian Analytics Inc. — Annual Report, Fiscal Year 2025\nFinancial Highlights\nMeridian Analytics Inc. reported total revenue of $101.7 million for fiscal year \n2025, a 20.8% increase over FY2024's $84.2 million. Net income rose to $15.2 \nmillion, compared to $11.6 million in the prior year.\nSegment Performance\nEnterprise Analytics revenue reached $68.9 million, growing 31.7% year-over-year \nand now representing 68% of total company revenue. Consulting Services grew more \nmodestly to $32.8 million.\nEuropean Expansion\nAs previously guided, the company launched operations in the United Kingdom and \nGermany in Q3 FY2025, contributing $4.1 million in revenue in its first two \nquarters and establishing a 22-person regional team based in London.\nOperating Expenses\nTotal operating expenses were $82.6 million, including $28.1 million in research \nand development, reflecting continued investment in the company's retrieval and \nevaluation tooling for AI-driven analytics products.\nHeadcount\nThe company ended FY2025 with 731 full-time employees, an increase of 119 from \nFY2024.\nOutlook\nManagement expects FY2026 revenue growth of 18% to 22%, with European operations \nexpected to reach profitability by Q4 FY2026."
+  },
+  {
+    "chunk_id": "expense_policy_000",
+    "document_id": "expense_policy",
+    "document_name": "Expense Policy",
+    "department": "Finance",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Expense Policy — Meridian Analytics Inc.\nPurpose\nThis policy governs how employees incur and report business expenses on behalf \nof Meridian Analytics Inc. All expenses must be reasonable, necessary for \nbusiness purposes, and properly documented.\nApproval Limits\nExpenses under $100 may be self-approved by the employee and submitted for \nreimbursement. Expenses between $100 and $1,000 require manager approval. \nExpenses above $1,000 require both manager and Finance Director approval before \nbeing incurred.\nReceipts\nOriginal itemized receipts are required for any expense over $25. Credit card \nstatements alone are not sufficient documentation. Receipts must be uploaded to \nthe expense system within 14 days of the transaction.\nNon-Reimbursable Items\nThe company will not reimburse personal entertainment, traffic or parking fines, \nspa or gym charges, or alcohol purchased without a client present. Any \nexceptions must be approved in writing by the Finance Director.\nCorporate Cards\nEmployees who travel frequently may be issued a corporate card. Corporate card \ntransactions must still be logged in the expense system with a business \njustification, even though no reimbursement is required."
+  },
+  {
+    "chunk_id": "reimbursement_policy_000",
+    "document_id": "reimbursement_policy",
+    "document_name": "Reimbursement Policy",
+    "department": "Finance",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Reimbursement Policy — Meridian Analytics Inc.\nSubmission Window\nAll reimbursement requests must be submitted within 30 days of the expense date. \nRequests submitted after 60 days will not be reimbursed except under documented \nextenuating circumstances approved by the Finance Director.\nPayment Timeline\nApproved reimbursements are paid out within the next two payroll cycles \nfollowing approval, via direct deposit to the employee's registered bank \naccount.\nCurrency and Exchange Rates\nExpenses incurred in a foreign currency are converted to USD using the exchange \nrate on the date of the transaction, as reflected on the employee's card \nstatement. Manually calculated conversions are not accepted.\nDisputed Reimbursements\nIf an employee disputes a rejected reimbursement, they may appeal in writing to \nthe Finance Director within 10 business days of the rejection, including any \nadditional supporting documentation.\nAdvances\nEmployees traveling internationally for more than 5 days may request a cash \nadvance of up to $500 through Finance, which is reconciled against actual \nexpenses upon their return."
+  },
+  {
+    "chunk_id": "travel_expense_policy_000",
+    "document_id": "travel_expense_policy",
+    "document_name": "Travel Expense Policy",
+    "department": "Finance",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Travel Expense Policy — Meridian Analytics Inc.\nBooking Travel\nAll flights and hotels must be booked through the company's designated travel \nportal to ensure duty-of-care tracking and negotiated corporate rates. \nExceptions require Finance Director approval in advance.\nFlight Class\nDomestic flights under 5 hours must be booked in economy class. International \nflights over 8 hours may be booked in premium economy or business class with \nDirector-level approval.\nHotel Limits\nStandard hotel spend is capped at $250 per night in major metro areas (e.g., New \nYork, San Francisco, London) and $180 per night elsewhere, unless a conference \nrate requires a different property.\nMeals While Traveling\nEmployees may claim up to $75 per day for meals while traveling on approved \nbusiness trips, itemized as breakfast, lunch, and dinner. Alcohol is only \nreimbursable when entertaining a client, up to $50 per event.\nGround Transportation\nRide-share and taxi expenses are reimbursable for airport transfers and client \nmeetings. Personal vehicle use is reimbursed at the current IRS standard mileage \nrate, calculated from the employee's regular office location.\nCombining Personal Travel\nEmployees may extend a business trip for personal travel, but the company will \nonly cover the cost equivalent to the business-only itinerary; any price \ndifference is the employee's responsibility."
+  },
+  {
+    "chunk_id": "employee_handbook_000",
+    "document_id": "employee_handbook",
+    "document_name": "Employee Handbook",
+    "department": "HR",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Employee Handbook — Meridian Analytics Inc.\nSection 1: Purpose and Scope\nThis handbook applies to all full-time, part-time, and contract employees of \nMeridian Analytics Inc. It summarizes company policies, employee expectations, \nand available benefits. It does not constitute an employment contract.\nSection 2: Working Hours\nStandard working hours are 9:00 AM to 6:00 PM, Monday through Friday, with a \none-hour unpaid lunch break. Employees in engineering and data roles may use \nflexible scheduling with manager approval, provided they are available during \ncore hours of 11:00 AM to 4:00 PM.\nSection 3: Code of Conduct\nEmployees are expected to act with integrity, treat colleagues with respect, and \navoid conflicts of interest. Harassment of any kind, including based on race, \ngender, religion, disability, or sexual orientation, will result in disciplinary \naction up to and including termination.\nSection 4: Performance Reviews\nFormal performance reviews occur twice a year, in June and December. Reviews are \nconducted by the employee's direct manager and include a self-assessment, \nmanager assessment, and goal-setting for the next cycle. Compensation \nadjustments are typically communicated within four weeks of the December review.\nSection 5: Confidentiality\nAll employees must sign a confidentiality agreement at the time of hiring. \nProprietary information, client data, and internal financial figures may not be \ndisclosed to any third party without written authorization from the Legal \ndepartment.\nSection 6: Grievance Procedure\nEmployees who wish to raise a concern about a colleague, manager, or workplace \ncondition should first speak with their manager. If the issue is not resolved, \nor involves the manager directly, the employee may escalate to HR via the \nconfidential HR portal."
+  },
+  {
+    "chunk_id": "parental_leave_policy_000",
+    "document_id": "parental_leave_policy",
+    "document_name": "Parental Leave Policy",
+    "department": "HR",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Parental Leave Policy — Meridian Analytics Inc.\n1. Eligibility\nAll employees who have completed at least six months of continuous employment \nare eligible for parental leave, regardless of gender or the manner in which \nthey became a parent (birth, adoption, or surrogacy).\n2. Duration\nPrimary caregivers are entitled to 16 weeks of paid parental leave. Secondary \ncaregivers are entitled to 6 weeks of paid leave. Leave must be taken within 12 \nmonths of the birth or placement of the child, and may be split into two blocks \nwith manager approval.\n3. Pay During Leave\nParental leave is paid at 100% of base salary for the eligible duration. This \ndoes not include bonus or commission components, which are prorated based on \nactual days worked in the relevant period.\n4. Application Process\nEmployees must notify their manager and HR at least 30 days before the expected \nstart of leave, where practicable. A parental leave request form must be \nsubmitted through the HR portal along with supporting documentation (e.g., due \ndate letter, adoption confirmation).\n5. Job Protection\nEmployees returning from parental leave are guaranteed reinstatement to the same \nor an equivalent role, with the same pay, benefits, and seniority, provided the \nleave did not exceed the policy maximum.\n6. Exceptions\nEmployees on active performance improvement plans (PIPs) at the time of their \nleave request will have their PIP paused during leave and resumed upon return, \nrather than being extended or cancelled."
+  },
+  {
+    "chunk_id": "remote_work_policy_000",
+    "document_id": "remote_work_policy",
+    "document_name": "Remote Work Policy",
+    "department": "HR",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Remote Work Policy — Meridian Analytics Inc.\nEligibility\nEmployees in roles that do not require regular on-site presence (e.g., most \nEngineering, Data, and certain Finance roles) may work remotely up to 3 days per \nweek, subject to manager approval. Fully remote arrangements require Director-\nlevel sign-off.\nEquipment\nThe company provides a laptop, monitor, and a one-time $400 home office stipend \nfor employees approved for regular remote work. Additional equipment requests \nare reviewed by IT on a case-by-case basis.\nCore Collaboration Hours\nRemote employees must be available and responsive during core hours of 11:00 AM \nto 4:00 PM in their local time zone, aligned with the standard working hours \ndefined in the Employee Handbook.\nSecurity Requirements\nRemote employees must connect to company systems via the corporate VPN and must \nnot access client data from personal, unencrypted devices, in line with the IT \nSecurity Policy.\nInternational Remote Work\nEmployees wishing to work remotely from a country other than their country of \nemployment must obtain approval from HR and Legal at least 6 weeks in advance, \ndue to tax and employment law considerations."
+  },
+  {
+    "chunk_id": "sick_leave_policy_000",
+    "document_id": "sick_leave_policy",
+    "document_name": "Sick Leave Policy",
+    "department": "HR",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Sick Leave Policy — Meridian Analytics Inc.\nEntitlement\nAll employees receive 10 paid sick days per calendar year, credited in full at \nthe start of employment or on January 1st for existing employees. Sick leave \ndoes not carry over to the following year.\nNotification\nEmployees should notify their manager as early as possible on the day of \nabsence, ideally before the start of their normal working hours. For absences \nlonger than three consecutive days, a note from a healthcare provider may be \nrequested by HR.\nExtended Illness\nEmployees requiring more than 10 sick days in a year due to a serious health \ncondition may apply for extended medical leave, which may be unpaid or covered \nby short-term disability insurance depending on tenure and plan enrollment.\nSick Leave for Family Care\nEmployees may use up to 5 of their 10 annual sick days to care for an immediate \nfamily member (spouse, child, or parent) who is ill.\nMisuse\nRepeated or suspected misuse of sick leave will be addressed through the \nstandard HR grievance and disciplinary process, in coordination with the \nemployee's manager."
+  },
+  {
+    "chunk_id": "vacation_policy_000",
+    "document_id": "vacation_policy",
+    "document_name": "Vacation Policy",
+    "department": "HR",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Vacation Policy — Meridian Analytics Inc.\nAccrual\nFull-time employees accrue 1.75 days of paid vacation per month, totaling 21 \ndays per year. Accrual begins on the first day of employment, but new hires may \nnot use accrued vacation during their first 90 days.\nCarryover\nEmployees may carry over a maximum of 5 unused vacation days into the following \ncalendar year. Any days beyond this cap are forfeited on December 31st unless \nlocal law requires otherwise.\nRequesting Time Off\nVacation requests should be submitted at least two weeks in advance through the \nHR portal for approval by the employee's manager. Requests during the last two \nweeks of December require additional lead time due to company-wide blackout \nscheduling.\nUnused Vacation at Termination\nUpon voluntary or involuntary termination, employees are paid out for unused \naccrued vacation days at their current base salary rate, in accordance with \nstate and local law.\nPart-Time Employees\nPart-time employees accrue vacation on a prorated basis according to their \ncontracted hours per week, calculated using the same 1.75-day-per-month formula \napplied to full-time equivalent hours."
+  },
+  {
+    "chunk_id": "acceptable_use_policy_000",
+    "document_id": "acceptable_use_policy",
+    "document_name": "Acceptable Use Policy",
+    "department": "IT",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Acceptable Use Policy — Meridian Analytics Inc.\nScope\nThis policy governs the acceptable use of company-owned devices, networks,\nand accounts, including email, cloud storage, and internal collaboration\ntools, by all employees and contractors.\nPermitted Use\nCompany systems are provided primarily for business purposes. Limited\npersonal use is permitted, provided it does not interfere with work\nresponsibilities, consume excessive resources, or violate any other company\npolicy.\nProhibited Activities\nEmployees may not use company systems to access illegal content, install\nunauthorized software, circumvent security controls, or run personal side\nbusinesses. Installing browser extensions or applications not approved by IT\nis prohibited on managed devices.\nEmail and Communication\nCompany email should not be used to send Restricted or Confidential data to\npersonal email accounts. Auto-forwarding rules that send company email to\nexternal addresses are disabled by default and require IT Security approval\nto enable.\nMonitoring\nThe company reserves the right to monitor use of company systems, including\nemail and internet activity, for security, compliance, and legal purposes,\nconsistent with applicable law and the IT Security Policy.\nEnforcement\nViolations of this policy may result in disciplinary action up to and\nincluding termination, and in some cases may be referred to Legal or law\nenforcement, particularly where illegal activity is involved."
+  },
+  {
+    "chunk_id": "access_control_policy_000",
+    "document_id": "access_control_policy",
+    "document_name": "Access Control Policy",
+    "department": "IT",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Access Control Policy — Meridian Analytics Inc.\nPrinciple of Least Privilege\nEmployees are granted the minimum level of system access required to perform\ntheir job duties. Additional access must be requested through the IT access\nrequest system and approved by both the requester's manager and the relevant\nsystem owner.\nRole-Based Access\nAccess to systems is assigned based on standardized role templates (e.g.,\n\"Data Analyst,\" \"Finance Associate\") wherever possible, rather than ad-hoc\nindividual permissions, to simplify auditing and reduce configuration drift.\nAccess Reviews\nSystem owners must review user access lists for Confidential and Restricted\nsystems on a quarterly basis and revoke any access that is no longer\nnecessary, including for employees who have changed roles internally.\nPrivileged Access\nAdministrative or privileged access to production systems requires additional\napproval from IT Security and is logged separately for audit purposes.\nPrivileged accounts must not be used for routine, non-administrative tasks.\nOffboarding\nAll system access must be revoked within 4 hours of an employee's termination\nbeing processed by HR, in line with the Employment Termination Policy,\nregardless of whether the termination is voluntary or involuntary."
+  },
+  {
+    "chunk_id": "incident_response_000",
+    "document_id": "incident_response",
+    "document_name": "Incident Response",
+    "department": "IT",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Incident Response Policy — Meridian Analytics Inc.\nSeverity Levels\nIncidents are classified as Severity 1 (critical, client-impacting or data\nbreach), Severity 2 (significant but contained), or Severity 3 (minor, no\nimmediate business impact). Severity 1 incidents trigger immediate escalation\nto the CTO and Legal.\nResponse Timeline\nSeverity 1 incidents must be acknowledged by the on-call IT Security engineer\nwithin 15 minutes and must have an initial containment action within 1 hour.\nSeverity 2 incidents must be acknowledged within 2 hours.\nCommunication Protocol\nFor any incident involving potential client data exposure, the Legal\ndepartment and affected client's designated contact must be notified within\n24 hours of confirmation, in accordance with contractual and regulatory\nobligations.\nPost-Incident Review\nWithin 5 business days of resolving a Severity 1 or Severity 2 incident, the\nIT Security team must produce a post-incident report covering root cause,\ntimeline, impact, and remediation steps, to be reviewed by leadership.\nData Breach Notification\nIn the event of a confirmed data breach involving personal data, Legal will\ndetermine notification obligations under applicable law (e.g., GDPR, state\nbreach notification laws) and coordinate the notification process with\naffected individuals and regulators as required."
+  },
+  {
+    "chunk_id": "password_policy_000",
+    "document_id": "password_policy",
+    "document_name": "Password Policy",
+    "department": "IT",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Password Policy — Meridian Analytics Inc.\nMinimum Requirements\nPasswords must be at least 14 characters long and include a mix of uppercase\nletters, lowercase letters, numbers, and special characters. Passwords may\nnot reuse any of the employee's last 10 passwords.\nMulti-Factor Authentication\nMulti-factor authentication (MFA) is mandatory for all systems classified as\nhandling Confidential or Restricted data, including email, the HR portal, and\nthe client data warehouse. SMS-based MFA is discouraged in favor of\nauthenticator apps or hardware keys.\nPassword Expiration\nPasswords for standard corporate accounts expire every 180 days. Passwords\nfor administrative or privileged accounts expire every 90 days and require\napproval from IT Security to reset outside the normal cycle.\nPassword Managers\nEmployees are required to use the company-approved password manager for\nstoring credentials to work systems. Storing passwords in browsers,\nspreadsheets, or plain text files is prohibited under this policy.\nAccount Lockout\nAccounts are automatically locked after 5 consecutive failed login attempts\nwithin a 15-minute window. Locked accounts can be unlocked by the employee\nvia self-service identity verification or by contacting the IT Helpdesk."
+  },
+  {
+    "chunk_id": "security_policy_000",
+    "document_id": "security_policy",
+    "document_name": "Security Policy",
+    "department": "IT",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "IT Security Policy — Meridian Analytics Inc.\nPurpose\nThis policy establishes baseline security requirements for all systems,\napplications, and data handled by Meridian Analytics Inc., in order to\nprotect company and client information from unauthorized access, disclosure,\nor loss.\nData Classification\nAll data must be classified as Public, Internal, Confidential, or Restricted.\nClient data and financial records are classified as Restricted by default and\nrequire the highest level of access control and encryption.\nEncryption Requirements\nRestricted and Confidential data must be encrypted at rest using AES-256 and\nin transit using TLS 1.2 or higher. Unencrypted storage of Restricted data on\nlaptops or removable media is strictly prohibited.\nIncident Reporting\nAny suspected security incident, including lost devices, phishing attempts,\nor unauthorized access, must be reported to the IT Security team within 1\nhour of discovery via the security hotline or incident portal.\nSecurity Training\nAll employees must complete annual security awareness training. New hires\nmust complete this training within their first 2 weeks of employment, before\nbeing granted access to Confidential or Restricted systems.\nThird-Party Access\nExternal vendors and contractors requiring system access must be provisioned\nwith time-limited accounts, reviewed quarterly, and immediately revoked upon\ncontract completion or termination, in coordination with the Vendor Agreement\nPolicy."
+  },
+  {
+    "chunk_id": "client_contract_a_000",
+    "document_id": "client_contract_a",
+    "document_name": "Client Contract A",
+    "department": "Legal",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Master Services Agreement — Client: Brightfield Retail Group\nThis Master Services Agreement (\"Agreement\") is entered into between Meridian\nAnalytics Inc. (\"Provider\") and Brightfield Retail Group (\"Client\") for the\nprovision of data analytics consulting services.\nScope of Services\nProvider will deliver quarterly customer segmentation analysis, inventory\ndemand forecasting models, and a monthly executive dashboard, as further\ndetailed in each Statement of Work (SOW) executed under this Agreement.\nTerm\nThis Agreement has an initial term of 24 months from the Effective Date, and\nwill automatically renew for successive 12-month periods unless either party\nprovides 90 days' written notice of non-renewal.\nFees\nClient agrees to pay Provider a monthly retainer of $45,000, plus any\nadditional project fees specified in individual SOWs. Invoices are due within\n30 days of receipt.\nData Ownership and Confidentiality\nAll Client data provided to Provider remains the exclusive property of\nClient. Provider may not use Client data for any purpose outside the scope of\nthis Agreement, including training of general-purpose machine learning\nmodels, without Client's prior written consent.\nTermination for Cause\nEither party may terminate this Agreement immediately upon material breach by\nthe other party that remains uncured 30 days after written notice.\nLimitation of Liability\nProvider's total liability under this Agreement shall not exceed the fees\npaid by Client in the 12 months preceding the claim, except in cases of gross\nnegligence or willful misconduct."
+  },
+  {
+    "chunk_id": "client_contract_b_000",
+    "document_id": "client_contract_b",
+    "document_name": "Client Contract B",
+    "department": "Legal",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Master Services Agreement — Client: Halden Manufacturing Corp\nThis Master Services Agreement (\"Agreement\") is entered into between Meridian\nAnalytics Inc. (\"Provider\") and Halden Manufacturing Corp (\"Client\") for\npredictive maintenance analytics services.\nScope of Services\nProvider will deploy and maintain a predictive maintenance model for Client's\nmanufacturing equipment, deliver weekly anomaly reports, and provide on-call\nsupport for critical alerts during Client's production hours.\nTerm\nThis Agreement has an initial term of 36 months from the Effective Date.\nEarly termination by Client prior to month 18 requires payment of an early\ntermination fee equal to 3 months of retainer fees.\nFees\nClient agrees to pay Provider a monthly retainer of $62,000. Fees are subject\nto an annual increase of up to 4%, tied to the Consumer Price Index,\nbeginning in the second year of the Agreement.\nService Level Agreement\nProvider guarantees 99.5% uptime for the predictive maintenance dashboard and\na response time of under 2 hours for critical anomaly alerts during Client's\nproduction hours. Failure to meet the SLA in two consecutive months entitles\nClient to a service credit of 10% of that month's fee.\nData Ownership and Confidentiality\nSensor and equipment data provided by Client remains Client's property.\nProvider may retain de-identified, aggregated data for internal model\nimprovement purposes only, as permitted under Section 8.2.\nLimitation of Liability\nProvider's total liability under this Agreement shall not exceed the fees\npaid by Client in the 12 months preceding the claim, except in cases of gross\nnegligence, willful misconduct, or breach of confidentiality obligations."
+  },
+  {
+    "chunk_id": "nda_policy_000",
+    "document_id": "nda_policy",
+    "document_name": "Nda Policy",
+    "department": "Legal",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Non-Disclosure Agreement (NDA) Policy — Meridian Analytics Inc.\nWhen an NDA Is Required\nAn NDA must be executed before any confidential information is shared with a\nprospective client, vendor, contractor, or partner, including during early-\nstage sales conversations and technical due diligence.\nStandard vs. Mutual NDAs\nThe Legal department maintains two templates: a one-way NDA (used when only\nMeridian's information will be disclosed) and a mutual NDA (used when both\nparties will share confidential information). Sales and Business Development\nshould default to the mutual template unless directed otherwise by Legal.\nApproval and Signing Authority\nNDAs based on the standard templates may be signed by any Director-level\nemployee or above. Any deviation from the standard template language must be\nreviewed and approved by Legal before signing, regardless of the signer's\nseniority.\nTerm of Confidentiality Obligations\nStandard NDAs impose confidentiality obligations for 3 years from the date of\ndisclosure, or 5 years for NDAs involving trade secrets or proprietary\nmachine learning methodologies.\nRecord Keeping\nAll executed NDAs must be uploaded to the central contract repository within\n5 business days of signing, tagged with the counterparty name and expiration\ndate, so Legal can track upcoming renewals or expirations."
+  },
+  {
+    "chunk_id": "termination_policy_000",
+    "document_id": "termination_policy",
+    "document_name": "Termination Policy",
+    "department": "Legal",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Employment Termination Policy — Meridian Analytics Inc.\nVoluntary Resignation\nEmployees are asked to provide at least two weeks' written notice of\nresignation. Employees in Director-level roles or above are encouraged to\nprovide four weeks' notice to support a smooth transition.\nInvoluntary Termination\nInvoluntary terminations must be reviewed and approved by HR and, for cause-\nbased terminations, by Legal, prior to being communicated to the employee.\nThis ensures consistent application of policy and reduces legal risk.\nFinal Pay\nFinal paychecks, including payout of unused accrued vacation as described in\nthe Vacation Policy, are issued no later than the next regular payroll cycle\nfollowing the termination date, or sooner where required by state law.\nSeverance\nEmployees terminated as part of a reduction-in-force (RIF) are eligible for\nseverance pay of two weeks' base salary per year of service, with a minimum\nof four weeks, contingent on signing a standard separation agreement.\nReturn of Company Property\nAll company property, including laptops, access badges, and any physical\ndocuments, must be returned on or before the employee's last day. Failure to\ndo so may result in the cost being deducted from final pay where permitted by\nlaw.\nExit Interviews\nHR conducts an exit interview with all departing employees to gather feedback\non their experience and identify any outstanding concerns before their\ndeparture."
+  },
+  {
+    "chunk_id": "vendor_agreement_000",
+    "document_id": "vendor_agreement",
+    "document_name": "Vendor Agreement",
+    "department": "Legal",
+    "year": null,
+    "page": 1,
+    "chunk_index": 0,
+    "chunking_strategy": "fixed",
+    "text": "Vendor Agreement Policy — Meridian Analytics Inc.\nVendor Onboarding\nAll new vendors must complete a security and compliance questionnaire\nadministered by the IT Security team before any contract is signed,\nparticularly for vendors who will process client or employee data.\nStandard Payment Terms\nUnless otherwise negotiated, vendor agreements use Net 45 payment terms.\nVendors requesting Net 30 or faster payment terms must be approved by the\nFinance Director, as this may affect cash flow planning.\nData Processing Vendors\nVendors that process personal data on Meridian's behalf (e.g., cloud\ninfrastructure, analytics tools) must sign a Data Processing Addendum (DPA)\nin addition to the main vendor agreement, and must demonstrate SOC 2 Type II\ncompliance or equivalent.\nTermination Rights\nStandard vendor agreements include a termination-for-convenience clause\nallowing Meridian to exit the agreement with 60 days' written notice, except\nfor vendors providing critical infrastructure, which require 120 days'\nnotice.\nRenewal Review\nVendor agreements above $50,000 in annual spend are reviewed by Procurement\nand Finance 90 days before renewal to evaluate performance, pricing, and\nwhether the vendor relationship should continue."
+  }
+]

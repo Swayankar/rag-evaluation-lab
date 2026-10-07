@@ -63,4 +63,4 @@ def rebuild_index(report: ReportFn, chunking: list[str] | None = None, settings:
         report(1.0, "Done.")
         return {"documents": len(pdfs), "chunks": chunk_counts}
     finally:
-        clear_pipeline_cache()
+        clear_pipeline_cache(settings.workspace_id)

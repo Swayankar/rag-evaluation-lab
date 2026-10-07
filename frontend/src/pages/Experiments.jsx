@@ -6,6 +6,7 @@ import RecommendationCard from "../components/RecommendationCard.jsx";
 import ExperimentTable from "../components/ExperimentTable.jsx";
 import ExperimentRunPanel from "../components/ExperimentRunPanel.jsx";
 import ExperimentEditor from "../components/ExperimentEditor.jsx";
+import ReadOnly from "../components/ReadOnly.jsx";
 import QuestionHeatmap from "../components/QuestionHeatmap.jsx";
 import { api } from "../services/api.js";
 import { useJob } from "../hooks/useJob.js";
@@ -386,28 +387,32 @@ export default function Experiments() {
           )}
 
           {tab === "run" && (
-            <ExperimentRunPanel
-              configs={configs.experiments}
-              numQuestions={numQuestions}
-              job={job}
-              onStart={start}
-              starting={starting}
-              hasComparison={Boolean(comparison)}
-              onGoSetup={() => setTab("setup")}
-              onGoQuestions={() => navigate("/evaluation")}
-            />
+            <ReadOnly>
+              <ExperimentRunPanel
+                configs={configs.experiments}
+                numQuestions={numQuestions}
+                job={job}
+                onStart={start}
+                starting={starting}
+                hasComparison={Boolean(comparison)}
+                onGoSetup={() => setTab("setup")}
+                onGoQuestions={() => navigate("/evaluation")}
+              />
+            </ReadOnly>
           )}
 
           {/* Always mounted (just hidden) so unsaved edits survive switching tabs. */}
           <div hidden={tab !== "setup"}>
-            <ExperimentEditor
-              initial={configs}
-              locked={running}
-              onSaved={async () => {
-                await loadConfigs();
-                await loadOverview();
-              }}
-            />
+            <ReadOnly>
+              <ExperimentEditor
+                initial={configs}
+                locked={running}
+                onSaved={async () => {
+                  await loadConfigs();
+                  await loadOverview();
+                }}
+              />
+            </ReadOnly>
           </div>
         </>
       )}

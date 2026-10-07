@@ -2,12 +2,15 @@ import time
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.core.config import Settings
 from app.core.dependencies import (
+    prepare_pipeline,
     get_pipeline_for_strategy,
     get_rag_pipeline,
     load_pipeline_for,
     with_top_k as _with_top_k,
 )
+from app.core.workspaces import NO_KEY_MESSAGE, key_missing, workspace_settings
 from app.core.logging import get_logger
 from app.generation.llm import GroqClientError
 from app.models.query import QueryResult
@@ -58,15 +61,17 @@ def _to_response(result: QueryResult, pipeline: RAGPipeline) -> QueryResponse:
 def ask_question(
     request: QueryRequest,
     pipeline: RAGPipeline = Depends(get_rag_pipeline),
+    settings: Settings = Depends(workspace_settings),
 ) -> QueryResponse:
+    if key_missing(settings):
+        raise HTTPException(status_code=400, detail=NO_KEY_MESSAGE)
     chunking = request.chunking_strategy or "fixed"
     retrieval = request.retrieval_strategy or "vector"
     if (chunking, retrieval) != ("fixed", "vector"):
-        pipeline = get_pipeline_for_strategy(retrieval, chunking)
-
-    pipeline = _with_top_k(pipeline, request.top_k)
+        pipeline = get_pipeline_for_strategy(retrieval, chunking, settings)
 
     try:
+        pipeline = _with_top_k(prepare_pipeline(pipeline, settings), request.top_k)
         result = pipeline.answer(request.question)
     except GroqClientError as exc:
         logger.error("Groq call failed: %s", exc)
@@ -76,7 +81,9 @@ def ask_question(
 
 
 @router.post("/compare", response_model=CompareResponse)
-def compare_strategies(request: CompareRequest) -> CompareResponse:
+def compare_strategies(
+    request: CompareRequest, settings: Settings = Depends(workspace_settings)
+) -> CompareResponse:
     """Run one question through several chunking x retrieval combinations.
 
     Runs sequentially (Groq's free tier rate-limits parallel calls). Failures
@@ -94,9 +101,12 @@ def compare_strategies(request: CompareRequest) -> CompareResponse:
         name = f"{chunking}_{retrieval}"
         base = dict(strategy_name=name, chunking_strategy=chunking, retrieval_strategy=retrieval)
         try:
-            pipeline = _with_top_k(load_pipeline_for(chunking, retrieval), request.top_k)
+            pipeline = _with_top_k(prepare_pipeline(load_pipeline_for(chunking, retrieval, settings), settings), request.top_k)
         except FileNotFoundError as exc:
             items.append(CompareItem(**base, error=str(exc)))
+            continue
+        except GroqClientError:  # no API key
+            items.append(CompareItem(**base, error=NO_KEY_MESSAGE))
             continue
 
         try:

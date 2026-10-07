@@ -1,0 +1,132 @@
+{
+  "experiments": [
+    "experiment_1_fixed_vector",
+    "experiment_3_fixed_hybrid",
+    "experiment_5_semantic_hybrid_rerank"
+  ],
+  "skipped": {},
+  "metrics": [
+    {
+      "metric": "avg_citation_accuracy",
+      "direction": "higher",
+      "values": {
+        "experiment_1_fixed_vector": 1.0,
+        "experiment_3_fixed_hybrid": 1.0,
+        "experiment_5_semantic_hybrid_rerank": 1.0
+      },
+      "best": "experiment_1_fixed_vector"
+    },
+    {
+      "metric": "avg_completeness",
+      "direction": "higher",
+      "values": {
+        "experiment_1_fixed_vector": 5.0,
+        "experiment_3_fixed_hybrid": 5.0,
+        "experiment_5_semantic_hybrid_rerank": 5.0
+      },
+      "best": "experiment_1_fixed_vector"
+    },
+    {
+      "metric": "avg_correctness",
+      "direction": "higher",
+      "values": {
+        "experiment_1_fixed_vector": 5.0,
+        "experiment_3_fixed_hybrid": 5.0,
+        "experiment_5_semantic_hybrid_rerank": 5.0
+      },
+      "best": "experiment_1_fixed_vector"
+    },
+    {
+      "metric": "avg_faithfulness",
+      "direction": "higher",
+      "values": {
+        "experiment_1_fixed_vector": 5.0,
+        "experiment_3_fixed_hybrid": 5.0,
+        "experiment_5_semantic_hybrid_rerank": 5.0
+      },
+      "best": "experiment_1_fixed_vector"
+    },
+    {
+      "metric": "avg_latency_ms",
+      "direction": "lower",
+      "values": {
+        "experiment_1_fixed_vector": 1732.3107999982312,
+        "experiment_3_fixed_hybrid": 1600.488600000972,
+        "experiment_5_semantic_hybrid_rerank": 2450.738950021332
+      },
+      "best": "experiment_3_fixed_hybrid"
+    },
+    {
+      "metric": "avg_mrr",
+      "direction": "higher",
+      "values": {
+        "experiment_1_fixed_vector": 0.75,
+        "experiment_3_fixed_hybrid": 1.0,
+        "experiment_5_semantic_hybrid_rerank": 1.0
+      },
+      "best": "experiment_3_fixed_hybrid"
+    },
+    {
+      "metric": "avg_precision_at_k",
+      "direction": "higher",
+      "values": {
+        "experiment_1_fixed_vector": 0.2,
+        "experiment_3_fixed_hybrid": 0.2,
+        "experiment_5_semantic_hybrid_rerank": 0.2
+      },
+      "best": "experiment_1_fixed_vector"
+    },
+    {
+      "metric": "avg_prompt_tokens",
+      "direction": "lower",
+      "values": {
+        "experiment_1_fixed_vector": 1466.0,
+        "experiment_3_fixed_hybrid": 1452.5,
+        "experiment_5_semantic_hybrid_rerank": 1403.0
+      },
+      "best": "experiment_5_semantic_hybrid_rerank"
+    },
+    {
+      "metric": "avg_recall_at_k",
+      "direction": "higher",
+      "values": {
+        "experiment_1_fixed_vector": 1.0,
+        "experiment_3_fixed_hybrid": 1.0,
+        "experiment_5_semantic_hybrid_rerank": 1.0
+      },
+      "best": "experiment_1_fixed_vector"
+    },
+    {
+      "metric": "avg_relevance",
+      "direction": "higher",
+      "values": {
+        "experiment_1_fixed_vector": 5.0,
+        "experiment_3_fixed_hybrid": 5.0,
+        "experiment_5_semantic_hybrid_rerank": 5.0
+      },
+      "best": "experiment_1_fixed_vector"
+    },
+    {
+      "metric": "hallucination_rate",
+      "direction": "lower",
+      "values": {
+        "experiment_1_fixed_vector": 0.0,
+        "experiment_3_fixed_hybrid": 0.0,
+        "experiment_5_semantic_hybrid_rerank": 0.0
+      },
+      "best": "experiment_1_fixed_vector"
+    }
+  ],
+  "wins": {
+    "experiment_1_fixed_vector": 8,
+    "experiment_3_fixed_hybrid": 2,
+    "experiment_5_semantic_hybrid_rerank": 1
+  },
+  "meta": {
+    "ran_at": "2026-10-07T08:29:35.291673+00:00",
+    "dataset_hash": "631ab24d",
+    "num_questions": 2,
+    "llm_judges": true,
+    "llm_model": "gemini-3.5-flash-lite"
+  }
+}
