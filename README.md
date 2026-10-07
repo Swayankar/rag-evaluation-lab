@@ -106,25 +106,25 @@ combination on retrieval quality, answer quality, grounding, citations, speed an
   <tr>
     <td align="center">
       <strong>🏡 Home</strong><br>
-      <img src="docs/home.png" width="300">
+      <img src="docs/Home.png" width="300">
     </td>
     <td align="center">
       <strong>🛝 Playground</strong><br>
-      <img src="docs/playground.png" width="300">
+      <img src="docs/Playground.png" width="300">
     </td>
     <td align="center">
       <strong>📂 Documents</strong><br>
-      <img src="docs/documents.png" width="300">
+      <img src="docs/Documents.png" width="300">
     </td>
   </tr>
   <tr>
     <td align="center">
       <strong>📊 Evaluation</strong><br>
-      <img src="docs/evaluation.png" width="300">
+      <img src="docs/Evaluation.png" width="300">
     </td>
     <td align="center">
       <strong>🧪 Experiments</strong><br>
-      <img src="docs/experiments.png" width="300">
+      <img src="docs/Experiments.png" width="300">
     </td>
     <td></td>
   </tr>
