@@ -56,4 +56,7 @@ app.include_router(workspaces.router)
 
 @app.get("/health", tags=["health"])
 def health() -> dict:
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "service": "RAG Evaluation Lab"
+    }

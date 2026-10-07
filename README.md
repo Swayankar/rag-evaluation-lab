@@ -1,9 +1,3 @@
----
-title: RAG Evaluation Lab
-sdk: docker
-app_port: 7860
----
-
 <div align="center">
 
 # 🧪 RAG Evaluation Lab
@@ -31,8 +25,6 @@ Most people try three or four questions, see a nice answer, and ship it.
 **RAG Evaluation Lab** is a full-stack playground that turns that guesswork into evidence. You upload PDFs, pick a
 chunking method and a retrieval strategy, ask questions, and then run a proper evaluation that scores every
 combination on retrieval quality, answer quality, grounding, citations, speed and cost.
-
-> 💡 One question it answers: _"Is hybrid search with a reranker actually worth the extra latency for my documents?"_
 
 ---
 
@@ -148,7 +140,7 @@ combination on retrieval quality, answer quality, grounding, citations, speed an
 | 🔭 **Observability** | LangSmith (optional)                                                                                   |
 | ⚛️ **Frontend**      | React 18, Vite, React Router, Recharts                                                                 |
 | 🧪 **Tests**         | pytest, Playwright (end-to-end checks)                                                                 |
-| 🐳 **Deploy**        | Docker, Hugging Face Spaces, Vercel for the UI                                                         |
+| 🐳 **Deploy**        | Render for the backend, Vercel for the UI                                                              |
 
 ---
 
@@ -156,7 +148,6 @@ combination on retrieval quality, answer quality, grounding, citations, speed an
 
 ```
 .
-├── 🐳 Dockerfile
 ├── 📦 requirements.txt · pyproject.toml
 ├── 📘 README.md
 ├── 🧫 experiments/              saved experiment runs

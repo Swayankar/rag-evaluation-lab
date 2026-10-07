@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
-import { QuickStart, StatusTiles } from "../components/LabStatus.jsx";
+import {
+  BackendStatus,
+  QuickStart,
+  StatusTiles,
+} from "../components/LabStatus.jsx";
 import HowItWorks from "../components/HowItWorks.jsx";
 import StrategyGuide from "../components/StrategyGuide.jsx";
 import MetricGuide from "../components/MetricGuide.jsx";
 import { useLabStatus } from "../hooks/useLabStatus.js";
+import { useBackendStatus } from "../hooks/useBackendStatus.js";
 
 const SECTIONS = [
   ["status", "Your lab"],
@@ -24,6 +29,7 @@ function Section({ id, title, intro, children }) {
 
 export default function Home() {
   const status = useLabStatus();
+  const backend = useBackendStatus();
 
   return (
     <div className="page home">
@@ -57,9 +63,27 @@ export default function Home() {
         title="Your lab right now"
         intro="Live from the backend. Click a tile to go to the page where you change it."
       >
-        {status.loading ? (
+        <BackendStatus status={backend.status} />
+
+        {backend.status === "checking" ? (
           <div className="run-bar">
-            <span className="spinner" /> <span className="muted">Loading…</span>
+            <span className="spinner" />
+            <span className="muted">Checking backend…</span>
+          </div>
+        ) : backend.status === "starting" ? (
+          <div className="notice notice-warn">
+            <div>
+              <strong>Backend is starting…</strong>
+
+              <div className="muted small" style={{ marginTop: 4 }}>
+                The RAG backend is waking up. This can take a little while on
+                the free hosting tier.
+              </div>
+            </div>
+
+            <button type="button" className="link" onClick={backend.check}>
+              Check again
+            </button>
           </div>
         ) : status.offline ? (
           <div className="notice notice-error">
