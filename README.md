@@ -1,3 +1,9 @@
+---
+title: RAG Evaluation Lab
+sdk: docker
+app_port: 7860
+---
+
 <div align="center">
 
 # 🧪 RAG Evaluation Lab
@@ -12,7 +18,6 @@ and see — with numbers — which combination actually answers best.
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
 ![Groq](https://img.shields.io/badge/LLM-Groq%20%7C%20OpenAI--compatible-F55036)
-![License](https://img.shields.io/badge/license-MIT-green)
 
 </div>
 
