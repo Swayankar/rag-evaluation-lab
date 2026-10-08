@@ -140,7 +140,7 @@ combination on retrieval quality, answer quality, grounding, citations, speed an
 | 🔭 **Observability** | LangSmith (optional)                                                                                   |
 | ⚛️ **Frontend**      | React 18, Vite, React Router, Recharts                                                                 |
 | 🧪 **Tests**         | pytest, Playwright (end-to-end checks)                                                                 |
-| 🐳 **Deploy**        | Render for the backend, Vercel for the UI                                                              |
+| 🐳 **Deploy**        | Docker, Render for the backend, Vercel for the UI                                                      |
 
 ---
 
@@ -148,6 +148,7 @@ combination on retrieval quality, answer quality, grounding, citations, speed an
 
 ```
 .
+├── 🐳 Dockerfile · .dockerignore
 ├── 📦 requirements.txt · pyproject.toml
 ├── 📘 README.md
 ├── 🧫 experiments/              saved experiment runs
@@ -222,6 +223,49 @@ Settings are environment variables, read from `.env` in the repo root. Use plain
 - 🔑 **Bring your own key** — visitors paste their own Groq key; it is never stored on your server.
 - 🧹 **Auto-cleanup** — idle workspaces are deleted after 7 days.
 - 🛡️ **Limits** — caps on workspaces, uploads and concurrent jobs protect your server.
+
+---
+
+## 🚢 Deployment
+
+The backend runs in a Docker container on **Render**; the frontend is a static site on **Vercel**. Both redeploy automatically when you push to GitHub.
+
+**Backend (Render → New → Web Service)**
+
+| Setting           | Value                                         |
+| ----------------- | --------------------------------------------- |
+| Language          | Docker                                        |
+| Root Directory    | _(Blank, the Dockerfile is at the repo root)_ |
+| Health check path | `/health`                                     |
+
+Environment variables:
+
+| Variable             | Value                                                             |
+| -------------------- | ----------------------------------------------------------------- |
+| `APP_MODE`           | `hosted`                                                          |
+| `CORS_ORIGINS`       | Vercel address, e.g. `https://app.vercel.app` (no trailing slash) |
+| `GROQ_MODEL`         | default model, e.g. `openai/gpt-oss-20b`                          |
+| `GROQ_MODEL_OPTIONS` | models shown in the dropdown                                      |
+| `ALLOW_CUSTOM_MODEL` | `true`                                                            |
+| `GROQ_API_KEY`       | Empty. Visitors paste their own                                   |
+
+Optional limits: `WORKSPACE_TTL_DAYS` (7), `MAX_WORKSPACES` (50), `MAX_WORKSPACES_PER_IP_PER_HOUR` (5), `MAX_DOCS_PER_WORKSPACE` (15), `MAX_WORKSPACE_MB` (60), `MAX_UPLOAD_MB` (25), `MAX_QUESTIONS_PER_WORKSPACE` (40), `MAX_CONCURRENT_JOBS` (2).
+
+**Frontend (Vercel → Add New → Project)**
+
+| Setting                | Value                                                                   |
+| ---------------------- | ----------------------------------------------------------------------- |
+| Root Directory         | `frontend`                                                              |
+| Build command / output | `npm run build` / `dist`                                                |
+| `VITE_API_URL`         | Render address, e.g. `https://app-api.onrender.com` (no trailing slash) |
+
+`VITE_API_URL` is built into the site, so after changing it, redeploy the frontend.
+
+**Notes**
+
+- 💤 Free Render servers sleep when idle. The first visit shows a "Waking up the server…" screen for about a minute, then the app opens by itself.
+- 🧠 The models need roughly 1–2 GB of RAM. If Render shows "Out of memory", use a larger instance.
+- 📁 Visitors' private workspaces live on the server's temporary disk and disappear on every redeploy. The sample comes from the data committed to the repo (`backend/data/documents`, `processed`, `evaluation` and `experiments/`).
 
 ---
 
