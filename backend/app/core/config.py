@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     groq_model: str = "openai/gpt-oss-20b"
     groq_base_url: str = "https://api.groq.com/openai/v1"
     # Models offered in the UI's dropdown (comma-separated). groq_model above is the default.
-    groq_model_options: str = "openai/gpt-oss-20b, openai/gpt-oss-120b, qwen/qwen3.8-27b, llama-3.1-8b-instant, llama-3.3-70b-versatile"
+    groq_model_options: str = "openai/gpt-oss-20b, openai/gpt-oss-120b, llama-3.1-8b-instant, llama-3.3-70b-versatile"
     # May a visitor type any model name? In hosted mode this only applies to visitors using their OWN key
     # (so nobody can point your key at an expensive model).
     allow_custom_model: bool = True
