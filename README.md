@@ -28,6 +28,35 @@ combination on retrieval quality, answer quality, grounding, citations, speed an
 
 ---
 
+## 🎥 Demo Videos
+
+- 📺 **[Demo 1 - App Mode: Local](https://youtu.be/asm-B9m5bKg)**
+- 📺 **[Demo 2 - App Mode: Hosted](https://youtu.be/HbMyYvWo4IE)**
+
+---
+
+## 🌐 Live Demo
+
+> **Note:** The frontend is hosted on **Vercel**, while the backend is deployed on **Render**.
+
+- **[Open Web App](https://rag-evaluation-lab-iota.vercel.app/)**
+
+---
+
+## ⚠️ Known limitations
+
+This project is hosted on free tiers, so a few limits apply:
+
+- 💤 **Cold starts:** the backend runs on a free server that sleeps when idle. The first visit can take about a minute while it wakes up. The app shows a waiting screen until it is ready.
+- 🧠 **Limited memory:** the backend runs two local models (an embedding model and a reranker) on a free instance with little memory. Heavy actions such as rebuilding an index, running a large evaluation, or using hybrid + rerank can make the server restart.
+- 🗑️ **Private workspaces are temporary:** a visitor's workspace is stored on the server's temporary disk. It is lost when the server restarts or redeploys, and idle workspaces are also deleted after 7 days. The app then returns the visitor to the read-only sample.
+- 💾 **Export before you leave:** questions can be exported as JSON, but uploaded PDFs and saved results are not backed up and have to be uploaded and run again.
+- 🔑 **Bring your own API key:** asking questions, evaluations and experiments need the visitor's own Groq key. Usage is limited by that key's rate limits and the chosen model.
+- 👥 **Shared capacity:** one worker serves everyone, with limits on workspaces, uploads, questions and concurrent jobs. Several visitors running evaluations at the same time will queue or be refused.
+- 🔒 **Not for confidential files:** uploads are stored on a shared server without extra security. Please don't upload private or sensitive documents.
+
+---
+
 ## ✨ Features
 
 |                                  |                                                                                                                                        |
