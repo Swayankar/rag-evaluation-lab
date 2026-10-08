@@ -186,29 +186,3 @@ export function QuickStart({ status }) {
     </div>
   );
 }
-
-export function BackendStatus({ status }) {
-  const config = {
-    checking: {
-      label: "Checking backend",
-      className: "backend-status-checking",
-    },
-    starting: {
-      label: "Backend starting",
-      className: "backend-status-starting",
-    },
-    online: {
-      label: "Backend online",
-      className: "backend-status-online",
-    },
-  };
-
-  const current = config[status] ?? config.checking;
-
-  return (
-    <div className={`backend-status ${current.className}`}>
-      <span className="backend-status-dot" />
-      {current.label}
-    </div>
-  );
-}
